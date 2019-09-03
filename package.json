@@ -1,0 +1,22 @@
+{
+  "name": "twitterbot",
+  "version": "1.0.0",
+  "description": "autogenerates images to be tweeted at a set time interval",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chroma-js": "^2.0.4",
+    "express": "^4.17.1",
+    "jsdom": "^15.1.1",
+    "mock-browser": "^0.92.14",
+    "paper": "^0.12.3",
+    "paper-jsdom": "^0.12.3",
+    "paper-jsdom-canvas": "^0.12.3",
+    "twit": "^2.2.11"
+  }
+}

@@ -1,16 +1,13 @@
 var fs = require('fs'),
     path = require('path'),
-    paper = require('paper-jsdom-canvas'),
     Twit = require('twit'),
-    chroma = require('chroma-js'),
-    MasterController = require('./MasterController.js'),
-    express = require('express');
+    MasterController = require('./MasterController.js');
 let loop = true;
 
 // 0: Square
 // 1: Circle
 // 2: Triangle
-let step_shape = 2;
+let step_shape = 0;
 
 let master_controller = new MasterController();
 while (loop) { //setInterval(4hrs)

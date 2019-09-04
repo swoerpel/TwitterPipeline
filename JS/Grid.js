@@ -5,8 +5,6 @@ class Grid {
     constructor(params) {
         this.params = params
         this.ants = []
-        this.grid = new Array(params.grid_size.x).fill()
-            .map(() => new Array(params.grid_size.y).fill(0));
         this.origin = {
             x_index: Math.floor(params.grid_size.x / 2),
             y_index: Math.floor(params.grid_size.y / 2)
@@ -18,30 +16,28 @@ class Grid {
 
     InitializeGrids() {
         this.grids = {}
-        console.log('initialize grid')
         switch (this.params.step_shape.name) {
             case 'square':
                 this.grids['color'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(0));
-                this.grids['stroke_weight'] = this.grid = new Array(this.params.grid_size.x).fill()
+                this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(0));
                 break;
             case 'circle':
                 this.grids['color'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(0));
-                this.grids['stroke_weight'] = this.grid = new Array(this.params.grid_size.x).fill()
+                this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(0));
                 break;
             case 'triangle':
                 this.grids['color'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(0));
-                this.grids['stroke_weight'] = this.grid = new Array(this.params.grid_size.x).fill()
+                this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(0));
-                this.grids['rotation'] = this.grid = new Array(this.params.grid_size.x).fill()
+                this.grids['rotation'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(0));
                 break;
         }
-        console.log('grids initialized', this.grids)
     }
 
     SetupRules() {
@@ -76,8 +72,6 @@ class Grid {
 
     SpawnAnts() {
         let ant_attributes = Templates.ant_attribute_templates[this.params.step_shape.id]
-        console.log('spawning ant ', this.params.step_shape.id)
-        console.log('ant attributes', ant_attributes)
         for (let i = 0; i < this.params.ant_count; i++) {
             let default_attributes = {
                 id: i,
@@ -98,8 +92,6 @@ class Grid {
             }
             let ant = { ...default_attributes, ...ant_attributes, }
             this.ants.push(ant)
-            console.log('ant ->', ant)
-            console.log('ant', i, '\t:\tshape:', this.params.step_shape.name)
         }
     }
 
@@ -116,15 +108,12 @@ class Grid {
         for (let i = 0; i < steps; i++) {
             this.ants.map((ant) => {
                 let step_value = this.grids['color'][ant.x][ant.y]
-                console.log('step value', step_value, ant.rule_indexes, this.all_rules)
-                console.log('current ant', ant)
                 this.all_rules[ant.rule_indexes[step_value]](ant)
                 this.UpdateAnt(ant)
                 this.UpdateGrids(ant)
-                // this.Draw(ant, step_value)
             })
         }
-        console.log('final grids', this.grids)
+        return this.grids
     }
 
     UpdateAnt(ant) {
@@ -148,36 +137,23 @@ class Grid {
         } else if (ant.y < 0) {
             ant.y = this.params.grid_size.y - 1;
         }
-
+        ant.step_count++
     }
 
     UpdateGrids(ant) {
-
         let grids = Object.keys(this.grids)
-        console.log('grids being updated', grids)
-
-
-        grids.map((type, index) => {
-            console.log('TYPE', type)
+        grids.map((type) => {
             if (type === 'color') {
-                this.grids[type][ant.x][ant.y] = (this.grids[type][ant.x][ant.y] + ant.color.increment_value) %
-                    ant.color.color_count
+                this.grids[type][ant.x][ant.y] = (this.grids[type][ant.x][ant.y] + ant.color.increment_value) % ant.color.color_count
             }
             if (type === 'stroke_weight') {
-                console.log('ANTSW', ant.sw)
                 this.grids[type][ant.x][ant.y] = ant.sw.values[ant.sw.index];
             }
             if (type === 'rotation') {
                 this.grids[type][ant.x][ant.y] = (Math.round(ant.rotation.value * 100) / 100)
             }
-            console.log('type || ', type)
-            console.log(this.grids[type])
-
         })
-        console.log(this.grids)
-        // this.grid[ant.x][ant.y] = (this.grid[ant.x][ant.y] + ant.tile_increment) % (this.params.state_count)
 
-        ant.step_count++
     }
 
 

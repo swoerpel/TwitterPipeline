@@ -70,14 +70,14 @@ var step_shapes = [
 ]
 
 var stroke_weight_templates = [
-    [1, 0.5], //square
+    [1], //square
     [1, 0.9, 0.8, 0.7, 0.6, 0.5], //circle
     [4, 2, 1, 0.5], //triangle
 ]
 
 var color_attributes = {
-    state_count: 10,
-    color_count: 10,
+    state_count: 100,
+    color_count: 100,
     increment_value: 1,
 }
 

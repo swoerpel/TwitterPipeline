@@ -23,7 +23,7 @@ class Grid {
                 this.grids['sub_shape'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(1));
                 this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill(0));
+                    .map(() => new Array(this.params.grid_size.y).fill([]));
                 break;
             case 'circle':
                 this.grids['color'] = new Array(this.params.grid_size.x).fill()
@@ -31,7 +31,7 @@ class Grid {
                 this.grids['sub_shape'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(1));
                 this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill(0));
+                    .map(() => new Array(this.params.grid_size.y).fill([]));
                 break;
             case 'triangle':
                 this.grids['color'] = new Array(this.params.grid_size.x).fill()
@@ -39,7 +39,7 @@ class Grid {
                 this.grids['sub_shape'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(1));
                 this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill(0));
+                    .map(() => new Array(this.params.grid_size.y).fill([]));
                 this.grids['rotation'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(0));
                 break;
@@ -76,6 +76,7 @@ class Grid {
 
     SpawnAnts() {
         let ant_attributes = Templates.ant_attribute_templates[this.params.step_shape.id]
+        console.log('ant attributes 32321', ant_attributes.stroke_weight)
         for (let i = 0; i < this.params.ant_count; i++) {
             let default_attributes = {
                 id: i,
@@ -90,10 +91,12 @@ class Grid {
                 step_count: 0,
                 step_size: 1,//move only one in each direction
                 stroke_weight: {
-                    index: ant_attributes.stroke_weight.index,
+                    index: 0,
                     values: this.params.stroke_weights,
                 }
             }
+            console.log('default_attributes', default_attributes)
+            console.log('ant_attributes', ant_attributes)
             let ant = { ...default_attributes, ...ant_attributes, }
             this.ants.push(ant)
         }
@@ -147,6 +150,7 @@ class Grid {
     UpdateGrids(ant) {
         let grids = Object.keys(this.grids)
         grids.map((type) => {
+            console.log('type', type, ant)
             if (type === 'color') {
                 this.grids[type][ant.x][ant.y] =
                     (this.grids[type][ant.x][ant.y] + ant.color.increment_value) % ant.color.color_count
@@ -155,8 +159,8 @@ class Grid {
                 this.grids[type][ant.x][ant.y] = ant.sub_shape.values[ant.sub_shape.index]
             }
             if (type === 'stroke_weight') {
-                // ant.stroke_weight.index = (ant.stroke_weight.index + 1) % ant.stroke_weight.values.length
-                this.grids[type][ant.x][ant.y] = ant.stroke_weight.values[ant.stroke_weight.index]
+                if (this.grids[type][ant.x][ant.y].indexOf(ant.stroke_weight.values[ant.stroke_weight.index]) == -1)
+                    this.grids[type][ant.x][ant.y].push(ant.stroke_weight.values[ant.stroke_weight.index])
             }
             if (type === 'rotation') {
                 this.grids[type][ant.x][ant.y] =
@@ -208,7 +212,7 @@ var decStrokeWeight = (ant) => {
 
     ant.stroke_weight.index -= 1
     if (ant.stroke_weight.index < 0)
-        ant.stroke_weight.index = ant.stroke_weight.values
+        ant.stroke_weight.index = (ant.stroke_weight.values.length - 1)
 
 }
 

@@ -17,8 +17,8 @@ var rule_templates = [
         turnRight: true,
         turnLeft: true,
         goStraight: true,
-        incStrokeWeight: false,
-        decStrokeWeight: false,
+        incStrokeWeight: true,
+        decStrokeWeight: true,
         incRotation: false,
         decRotation: false,
         incStepSize: false,
@@ -70,7 +70,7 @@ var step_shapes = [
 ]
 
 var stroke_weight_templates = [
-    [1], //square
+    [1, .9, .8, .7, .6, .5], //square
     [2, 1, 0.5],//, 0.9, 0.8, 0.7, 0.6, 0.5], //circle
     [4, 2, 1, 0.5], //triangle
 ]
@@ -78,19 +78,19 @@ var stroke_weight_templates = [
 
 
 var color_attributes = {
-    state_count: 150,
-    color_count: 150,
+    state_count: 15,
+    color_count: 15,
     increment_value: 1,
 }
 
 var sub_shape_attributes = {
     index: 0,
-    values: [1, 2],
+    values: [1, 2,],
 }
-var stroke_weight_attributes = {
-    index: 0,
-    values: [] // assigned with sw template earlier
-}
+// var stroke_weight_attributes = {
+//     index: 0,
+//     values: [] // assigned with sw template earlier
+// }
 
 var rotation_attributes = {
     value: 0,
@@ -102,17 +102,17 @@ var ant_attribute_templates = [
     { //square
         color: color_attributes,
         sub_shape: sub_shape_attributes,
-        stroke_weight: stroke_weight_attributes
+        // stroke_weight: stroke_weight_attributes
     },
     { //circle
         color: color_attributes,
         sub_shape: sub_shape_attributes,
-        stroke_weight: stroke_weight_attributes,
+        // stroke_weight: stroke_weight_attributes,
     },
     { //triangle
         color: color_attributes,
         sub_shape: sub_shape_attributes,
-        stroke_weight: stroke_weight_attributes,
+        // stroke_weight: stroke_weight_attributes,
         rotation: rotation_attributes
     }
 ]

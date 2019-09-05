@@ -23,7 +23,6 @@ while (loop) { //setInterval(4hrs)
 
 //untested
 function PostImage(img_path) {
-    console.lo
     var T = new Twit(config);
     var image_path = img_path
     // var image_path = path.join(__dirname, "..\\images\\"),

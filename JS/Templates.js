@@ -17,15 +17,14 @@ var rule_templates = [
         turnRight: true,
         turnLeft: true,
         goStraight: true,
-        incStrokeWeight: true,
-        decStrokeWeight: true,
+        incStrokeWeight: false,
+        decStrokeWeight: false,
         incRotation: false,
         decRotation: false,
-        swapDrawShape: false,
         incStepSize: false,
         decStepSize: false,
-        incSubShapes: false,
-        decSubShapes: false,
+        incSubShapes: true,
+        decSubShapes: true,
     },
     { //circle
         turnRight: true,
@@ -35,7 +34,6 @@ var rule_templates = [
         decStrokeWeight: true,
         incRotation: false,
         decRotation: false,
-        swapDrawShape: false,
         incStepSize: false,
         decStepSize: false,
         incSubShapes: true,
@@ -49,7 +47,6 @@ var rule_templates = [
         decStrokeWeight: true,
         incRotation: true,
         decRotation: true,
-        swapDrawShape: false,
         incStepSize: false,
         decStepSize: false,
         incSubShapes: false,
@@ -61,6 +58,9 @@ var grid_sizes = [
     { x: 2, y: 2 },
     { x: 4, y: 4 },
     { x: 8, y: 8 },
+    { x: 16, y: 16 },
+    { x: 32, y: 32 },
+    { x: 64, y: 64 },
 ]
 
 var step_shapes = [
@@ -71,19 +71,25 @@ var step_shapes = [
 
 var stroke_weight_templates = [
     [1], //square
-    [1, 0.9, 0.8, 0.7, 0.6, 0.5], //circle
+    [2, 1, 0.5],//, 0.9, 0.8, 0.7, 0.6, 0.5], //circle
     [4, 2, 1, 0.5], //triangle
 ]
 
+
+
 var color_attributes = {
-    state_count: 100,
-    color_count: 100,
+    state_count: 150,
+    color_count: 150,
     increment_value: 1,
 }
 
+var sub_shape_attributes = {
+    index: 0,
+    values: [1, 2],
+}
 var stroke_weight_attributes = {
     index: 0,
-
+    values: [] // assigned with sw template earlier
 }
 
 var rotation_attributes = {
@@ -95,14 +101,17 @@ var rotation_attributes = {
 var ant_attribute_templates = [
     { //square
         color: color_attributes,
+        sub_shape: sub_shape_attributes,
         stroke_weight: stroke_weight_attributes
     },
     { //circle
         color: color_attributes,
+        sub_shape: sub_shape_attributes,
         stroke_weight: stroke_weight_attributes,
     },
     { //triangle
         color: color_attributes,
+        sub_shape: sub_shape_attributes,
         stroke_weight: stroke_weight_attributes,
         rotation: rotation_attributes
     }

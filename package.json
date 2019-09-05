@@ -17,6 +17,7 @@
     "paper": "^0.12.3",
     "paper-jsdom": "^0.12.3",
     "paper-jsdom-canvas": "^0.12.3",
+    "svg2img": "^0.6.1",
     "twit": "^2.2.11"
   }
 }

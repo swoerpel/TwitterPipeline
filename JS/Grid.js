@@ -20,18 +20,24 @@ class Grid {
             case 'square':
                 this.grids['color'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(0));
+                this.grids['sub_shape'] = new Array(this.params.grid_size.x).fill()
+                    .map(() => new Array(this.params.grid_size.y).fill(1));
                 this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(0));
                 break;
             case 'circle':
                 this.grids['color'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(0));
+                this.grids['sub_shape'] = new Array(this.params.grid_size.x).fill()
+                    .map(() => new Array(this.params.grid_size.y).fill(1));
                 this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(0));
                 break;
             case 'triangle':
                 this.grids['color'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(0));
+                this.grids['sub_shape'] = new Array(this.params.grid_size.x).fill()
+                    .map(() => new Array(this.params.grid_size.y).fill(1));
                 this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(0));
                 this.grids['rotation'] = new Array(this.params.grid_size.x).fill()
@@ -56,8 +62,6 @@ class Grid {
             this.all_rules.push((ant) => incRotation(ant))
         if (this.params.rule_template.decRotation)
             this.all_rules.push((ant) => decRotation(ant))
-        if (this.params.rule_template.swapDrawShape)
-            this.all_rules.push((ant) => swapDrawShape(ant))
         if (this.params.rule_template.incStepSize)
             this.all_rules.push((ant) => incStepSize(ant))
         if (this.params.rule_template.decStepSize)
@@ -85,7 +89,7 @@ class Grid {
                 direction: 0,
                 step_count: 0,
                 step_size: 1,//move only one in each direction
-                sw: {
+                stroke_weight: {
                     index: ant_attributes.stroke_weight.index,
                     values: this.params.stroke_weights,
                 }
@@ -144,13 +148,19 @@ class Grid {
         let grids = Object.keys(this.grids)
         grids.map((type) => {
             if (type === 'color') {
-                this.grids[type][ant.x][ant.y] = (this.grids[type][ant.x][ant.y] + ant.color.increment_value) % ant.color.color_count
+                this.grids[type][ant.x][ant.y] =
+                    (this.grids[type][ant.x][ant.y] + ant.color.increment_value) % ant.color.color_count
+            }
+            if (type === 'sub_shape') {
+                this.grids[type][ant.x][ant.y] = ant.sub_shape.values[ant.sub_shape.index]
             }
             if (type === 'stroke_weight') {
-                this.grids[type][ant.x][ant.y] = ant.sw.values[ant.sw.index];
+                // ant.stroke_weight.index = (ant.stroke_weight.index + 1) % ant.stroke_weight.values.length
+                this.grids[type][ant.x][ant.y] = ant.stroke_weight.values[ant.stroke_weight.index]
             }
             if (type === 'rotation') {
-                this.grids[type][ant.x][ant.y] = (Math.round(ant.rotation.value * 100) / 100)
+                this.grids[type][ant.x][ant.y] =
+                    (Math.round(ant.rotation.value * 100) / 100)
             }
         })
 
@@ -190,13 +200,16 @@ var decStepSize = (ant) => {
 }
 
 var incStrokeWeight = (ant) => {
-    if (ant.sw.index < (ant.sw.values.length - 1))
-        ant.sw.index++
+    ant.stroke_weight.index = (ant.stroke_weight.index + 1) % ant.stroke_weight.values.length
+
 }
 
 var decStrokeWeight = (ant) => {
-    if (ant.sw.index >= 1)
-        ant.sw.index--
+
+    ant.stroke_weight.index -= 1
+    if (ant.stroke_weight.index < 0)
+        ant.stroke_weight.index = ant.stroke_weight.values
+
 }
 
 
@@ -207,22 +220,15 @@ var decRotation = (ant) => {
     ant.rotation.value -= ant.rotation.delta
 }
 
-var swapDrawShape = (ant) => {
-    grid_params.draw_shape == 0 ?
-        grid_params.draw_shape = 1 :
-        grid_params.draw_shape = 0
-}
 
 var incSubShapes = (ant) => {
-    ant.sub_shape_index = (ant.sub_shape_index + 1) % grid_params.max_sub_shape
-    console.log('inc', ant.sub_shape_index)
+    ant.sub_shape.index = (ant.sub_shape.index + 1) % ant.sub_shape.values.length
 }
 
 var decSubShapes = (ant) => {
-    (ant.sub_shape_index == 0) ?
-        ant.sub_shape_index = grid_params.max_sub_shape :
-        ant.sub_shape_index--
-    console.log('dec', ant.sub_shape_index)
+    (ant.sub_shape.index < 1) ?
+        ant.sub_shape.index = ant.sub_shape.values.length - 1 :
+        ant.sub_shape.index--
 }
 
 /*

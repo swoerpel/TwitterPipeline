@@ -94,7 +94,7 @@ var rotation_attributes = {
     delta: Math.PI / 2
 }
 
-
+// ARRAY
 var ant_attribute_templates = [
     { //square
         color: color_attributes,

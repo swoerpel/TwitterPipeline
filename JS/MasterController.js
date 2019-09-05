@@ -8,10 +8,11 @@ var svg2img = require('svg2img');
 var btoa = require('btoa');
 class MasterController {
     constructor() {
-        this.paper_width = 2400
+        this.paper_width = 2400 * 2
         this.paper_height = 2400
         paper.setup(new paper.Size(this.paper_width, this.paper_height))
-        this.color_machine = chroma.scale('Spectral')
+        this.color_machine = chroma.scale('RdBu')
+        // this.color_machine = chroma.scale('Spectrcon')
     }
 
     GenerateImage(step_shape) {
@@ -30,11 +31,11 @@ class MasterController {
         let stroke_weight = grid_layers.stroke_weight[i][j] * this.paper_width / this.vital_params.grid_size.x
         let scaled_x = this.paper_width / this.vital_params.grid_size.x * i + stroke_weight / 2;
         let scaled_y = this.paper_height / this.vital_params.grid_size.y * j + stroke_weight / 2;
-        console.log(i, j, scaled_x, scaled_y);
+        // console.log(i, j, scaled_x, scaled_y);
         let topleft = new paper.Point(scaled_x, scaled_y);
         // let rect_size = new paper.Size(stroke_weight, stroke_weight);
         // let squarePath = new paper.Path.Rectangle(topleft, rect_size)
-        console.log('color val', grid_layers.color[i][j] / 100);
+        // console.log('color val', grid_layers.color[i][j] / 100);
 
         // squarePath.fillColor = this.color_machine(grid_layers.color[i][j] / 100).hex()
         // var circle = new paper.Path.Circle({
@@ -66,65 +67,45 @@ class MasterController {
 
                     //when sub shape value is not 1
                     //concentric smaller shapes take over
-                    if (sub_shape_value != 1) {
-                        let sub_shape_group = new paper.Group()
-                        for (let k = 0; k < sub_shape_value; k++) {
-                            for (let l = 0; l < sub_shape_value; l++) {
-                                let x_local_origin = x_origin + default_width / sub_shape_value * k
-                                let y_local_origin = y_origin + default_width / sub_shape_value * l
-                                let origin = new paper.Point(x_local_origin, y_local_origin);
-                                let size = new paper.Size(default_width / sub_shape_value, default_width / sub_shape_value);
-                                let rect = new paper.Path.Rectangle(origin, size);
-                                rect.fillColor = this.color_machine(Math.random()).hex();
-                                // rect.fillColor = this.color_machine(grid_layers.color[i][j] / 100 / sub_shape_value * k * l).hex();
-                                sub_shape_group.addChild(rect)
-                                console.log(sub_shape_value, ' && local subshape origin && ', x_local_origin, y_local_origin)
+                    let sub_shape_group = new paper.Group()
+                    for (let k = 0; k < sub_shape_value; k++) {
+                        for (let l = 0; l < sub_shape_value; l++) {
+                            let x_local_origin = x_origin + default_width / sub_shape_value * k
+                            let y_local_origin = y_origin + default_width / sub_shape_value * l
+                            let origin = new paper.Point(x_local_origin, y_local_origin);
+                            let size = new paper.Size(default_width / sub_shape_value, default_width / sub_shape_value);
+                            let rect = new paper.Path.Rectangle(origin, size);
+                            rect.fillColor = this.color_machine(Math.random()).hex();
+                            // rect.fillColor = this.color_machine(grid_layers.color[i][j] / 100 / sub_shape_value * k * l).hex();
+                            sub_shape_group.addChild(rect)
+                            // console.log(sub_shape_value, ' && local subshape origin && ', x_local_origin, y_local_origin)
+
+                            let concentric_sub_stroke_weights;
+                            if (sub_shape_value == 1)
+                                concentric_sub_stroke_weights = grid_layers.stroke_weight[i][j];
+                            else {
+                                let max_sub_stroke_weight = Math.max()
+                                // concentric_sub_stroke_weights = grid_layers.stroke_weight[i][j].filter((sw) => {
+                                //     // return sw <= max_sub_stroke_weight
+                                //     let active_sws = Templates.ant_attribute_templates[0].sub_shape.stroke_weights
+                                //     return active_sws[Math.round(Math.random() * active_sws.length)]
+                                // })
+                                // let active_sws = Templates.ant_attribute_templates[0].sub_shape.stroke_weights
+                                // concentric_sub_stroke_weights = active_sws[Math.round(Math.random() * active_sws.length)]
+                                concentric_sub_stroke_weights = Templates.ant_attribute_templates[0].sub_shape.stroke_weights
                             }
+                            concentric_sub_stroke_weights.map((sw, index) => {
+                                let con_size = new paper.Size(size.width, size.height);
+                                let con_rect = new paper.Path.Rectangle(origin, con_size);
+                                con_rect.fillColor = this.color_machine(
+                                    // (index / concentric_stroke_weights.length) *
+                                    // (grid_layers.color[i][j] / 15)
+                                    Math.random()
+                                ).hex();
+                                con_rect.scale(sw, con_rect.bounds.center);
+                            });
                         }
                     }
-                    else {
-                        // console.log('concentric dimishing shape size', grid_layers.stroke_weight)
-                        let concentric_stroke_weights = grid_layers.stroke_weight[i][j]
-                        // console.log('sub_widths', sub_widths)
-                        let origin = new paper.Point(x_origin, y_origin);
-
-                        concentric_stroke_weights.map((sw, index) => {
-                            let size = new paper.Size(default_width, default_width);
-                            let rect = new paper.Path.Rectangle(origin, size);
-                            rect.fillColor = this.color_machine(
-                                (index / concentric_stroke_weights.length) *
-                                (grid_layers.color[i][j] / 15)
-                            ).hex();
-                            rect.scale(sw, rect.bounds.center);
-                        });
-
-                    }
-                    // console.log('stroke weight grid layer', grid_layers.stroke_weight[i][j])
-                    // console.log('def width', default_width)
-                    // let scaled_x = 0//this.paper_width / this.vital_params.grid_size.x * i
-                    // let scaled_y = 0//this.paper_height / this.vital_params.grid_size.y * j
-
-
-                    // console.log(i, j, scaled_x, scaled_y, 'stroke_weight->', stroke_weight)
-                    // let square_len = default_width * stroke_weights[0]
-                    // x_origin += square_len / 2
-                    // y_origin += square_len / 2
-                    // let size = new paper.Size(square_len, square_len);
-
-                    // let origin = new paper.Point(x_origin, y_origin);
-                    // let color = this.color_machine().hex();
-
-                    // console.log('stroke weight', stroke_weights.sort().reverse())
-                    // stroke_weights = stroke_weights.reverse()
-                    // stroke_weights.map((sw, index) => {
-                    // let size = new paper.Size(default_width, default_width);
-                    // let rect = new paper.Path.Rectangle(origin, size);
-                    // rect.strokeWidth = 0;
-                    // rect.fillColor = this.color_machine(grid_layers.color[i][j] / 100).hex();
-                    // rect.scale(sw, rect.bounds.center);
-                    // });
-
-
 
                 }
                 if (this.vital_params.step_shape.name == 'circle') {
@@ -168,11 +149,11 @@ class MasterController {
                 name: Templates.step_shapes[step_shape]
             },
             rule_template: Templates.rule_templates[step_shape],
-            grid_size: Templates.grid_sizes[0],
+            grid_size: Templates.grid_sizes[1],
             stroke_weights: Templates.stroke_weight_templates[step_shape],
-            ant_count: 1,
+            ant_count: 5,
             ant_origins_random: true,
-            duration: 100,
+            duration: 1000,
         }
         // console.log('vital_params.stroke_weights', vital_params.stroke_weights)
         return vital_params;

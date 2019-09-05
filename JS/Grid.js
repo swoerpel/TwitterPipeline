@@ -76,7 +76,7 @@ class Grid {
 
     SpawnAnts() {
         let ant_attributes = Templates.ant_attribute_templates[this.params.step_shape.id]
-        console.log('ant attributes 32321', ant_attributes.stroke_weight)
+        // console.log('ant attributes 32321', ant_attributes.stroke_weight)
         for (let i = 0; i < this.params.ant_count; i++) {
             let default_attributes = {
                 id: i,
@@ -95,8 +95,8 @@ class Grid {
                     values: this.params.stroke_weights,
                 }
             }
-            console.log('default_attributes', default_attributes)
-            console.log('ant_attributes', ant_attributes)
+            // console.log('default_attributes', default_attributes)
+            // console.log('ant_attributes', ant_attributes)
             let ant = { ...default_attributes, ...ant_attributes, }
             this.ants.push(ant)
         }
@@ -150,7 +150,7 @@ class Grid {
     UpdateGrids(ant) {
         let grids = Object.keys(this.grids)
         grids.map((type) => {
-            console.log('type', type, ant)
+            // console.log('type', type, ant)
             if (type === 'color') {
                 this.grids[type][ant.x][ant.y] =
                     (this.grids[type][ant.x][ant.y] + ant.color.increment_value) % ant.color.color_count

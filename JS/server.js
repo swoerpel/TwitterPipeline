@@ -8,7 +8,7 @@ let loop = true;
 // 0: Square
 // 1: Circle
 // 2: Triangle
-let step_shape = 0;
+let step_shape = 1;
 
 let master_controller = new MasterController();
 while (loop) { //setInterval(4hrs)
@@ -16,7 +16,7 @@ while (loop) { //setInterval(4hrs)
     let image_path = master_controller.GenerateImage(step_shape);
     // img_path = "C:\\Files\\Programming\\TwitterPipeline\\images\\" + image_id + '.png'
     // let img_path = path.resolve("../images/")
-    PostImage(image_path);
+    // PostImage(image_path);
     loop = false;
 }
 

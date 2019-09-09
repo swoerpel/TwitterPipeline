@@ -24,6 +24,8 @@ class Grid {
                     .map(() => new Array(this.params.grid_size.y).fill(1));
                 this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill([]));
+                this.grids['rotation'] = new Array(this.params.grid_size.x).fill()
+                    .map(() => new Array(this.params.grid_size.y).fill([]));
                 break;
             case 'circle':
                 this.grids['color'] = new Array(this.params.grid_size.x).fill()
@@ -31,6 +33,8 @@ class Grid {
                 this.grids['sub_shape'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(1));
                 this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
+                    .map(() => new Array(this.params.grid_size.y).fill([]));
+                this.grids['rotation'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill([]));
                 break;
             case 'triangle':
@@ -41,7 +45,7 @@ class Grid {
                 this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill([]));
                 this.grids['rotation'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill(0));
+                    .map(() => new Array(this.params.grid_size.y).fill([]));
                 break;
         }
     }
@@ -163,8 +167,12 @@ class Grid {
                     this.grids[type][ant.x][ant.y].push(ant.stroke_weight.values[ant.stroke_weight.index])
             }
             if (type === 'rotation') {
-                this.grids[type][ant.x][ant.y] =
-                    (Math.round(ant.rotation.value * 100) / 100)
+                let value = (Math.round(ant.rotation.value * 100) / 100)
+
+                if (this.grids[type][ant.x][ant.y].indexOf(value) == -1) {
+                    // console.log('rotation value', value, this.grids[type][ant.x][ant.y].indexOf(value))
+                    this.grids[type][ant.x][ant.y].push(value);
+                }
             }
         })
 
@@ -218,10 +226,10 @@ var decStrokeWeight = (ant) => {
 
 
 var incRotation = (ant) => {
-    ant.rotation.value += ant.rotation.delta
+    ant.rotation.value = (ant.rotation.value + ant.rotation.delta) % 360
 }
 var decRotation = (ant) => {
-    ant.rotation.value -= ant.rotation.delta
+    ant.rotation.value = (ant.rotation.value - ant.rotation.delta) % 360
 }
 
 

@@ -12,8 +12,8 @@ class MasterController {
         this.paper_height = 2400
         paper.setup(new paper.Size(this.paper_width, this.paper_height))
 
-        this.color_machine = chroma.scale(chroma.brewer.Greys)
-        // this.color_machine = chroma.scale('RdBu')
+        // this.color_machine = chroma.scale(chroma.brewer.Greys)
+        this.color_machine = chroma.scale('RdBu')
         // this.color_machine = chroma.scale('Spectrcon')
     }
 
@@ -71,25 +71,34 @@ class MasterController {
                     width: this.paper_width / this.vital_params.grid_size.x,
                     color: grid_layers.color[i][j],
                     sub_shape: grid_layers.sub_shape[i][j],
-                    stroke_weight: grid_layers.stroke_weight[i][j]
+                    stroke_weight: grid_layers.stroke_weight[i][j],
+                    rotation: grid_layers.rotation[i][j]
                 }
                 if (this.vital_params.step_shape.name == 'square')
                     this.DrawSquares(grid_values);
                 if (this.vital_params.step_shape.name == 'circle')
                     this.DrawCircles(grid_values);
+                if (this.vital_params.step_shape.name == 'triangle')
+                    this.DrawTriangles(grid_values);
             }
         }
     }
 
     DrawSquares(grid_values) {
+
+        let color_ceil = round(grid_values.color / Templates.ant_attribute_templates[0].color.color_count, 3)// / grid_values.sub_shape;
+        let color_inc = round(color_ceil / grid_values.sub_shape, 3)
+        let color_count = 0;
+        console.log('color ceiling - color inc - grid_values.color')
+        console.log(color_ceil, color_inc, grid_values.color)
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k
                 let y_local_origin = grid_values.origin.y + grid_values.width / grid_values.sub_shape * l
                 let local_origin = new paper.Point(x_local_origin, y_local_origin);
                 let size = new paper.Size(grid_values.width / grid_values.sub_shape, grid_values.width / grid_values.sub_shape);
-                let square = new paper.Path.Rectangle(local_origin, size);
-                square.fillColor = this.color_machine(Math.random()).hex();
+                // let square = new paper.Path.Rectangle(local_origin, size);
+                // square.fillColor = this.color_machine(Math.random()).hex();
                 let concentric_sub_stroke_weights = grid_values.stroke_weight;
                 if (grid_values.sub_shape != 1)
                     concentric_sub_stroke_weights = Templates.ant_attribute_templates[0].sub_shape.stroke_weights;
@@ -97,8 +106,11 @@ class MasterController {
                     let con_size = new paper.Size(size.width, size.height);
                     let concentric_square = new paper.Path.Rectangle(local_origin, con_size);
                     concentric_square.fillColor = this.color_machine(
-                        Math.random()
+                        // Math.random()// * grid_values.color
+                        // grid_values.color
+                        (color_count + 1) * color_inc
                     ).hex();
+                    color_count++;
                     concentric_square.scale(sw, concentric_square.bounds.center);
                 });
             }
@@ -120,13 +132,48 @@ class MasterController {
                 concentric_sub_stroke_weights.map((sw) => {
                     let concentric_circle = new paper.Path.Circle(local_origin, radius);
                     concentric_circle.fillColor = this.color_machine(
-                        // (index / concentric_stroke_weights.length) *
-                        // (grid_layers.color[i][j] / 15)
-                        Math.random()
+                        Math.random()// * grid_values.color
                     ).hex();
                     concentric_circle.scale(sw, concentric_circle.bounds.center);
                 });
 
+            }
+        }
+    }
+
+    DrawTriangles(grid_values) {
+        for (let k = 0; k < grid_values.sub_shape; k++) {
+            for (let l = 0; l < grid_values.sub_shape; l++) {
+                let radius = grid_values.width / grid_values.sub_shape / 2
+                let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k + radius
+                let y_local_origin = grid_values.origin.y + grid_values.width / grid_values.sub_shape * l + radius
+                let local_origin = new paper.Point(x_local_origin, y_local_origin);
+                // let origin_circle = new paper.Path.Circle(local_origin, radius)
+                // origin_circle.fillColor = 'black'
+                let concentric_sub_stroke_weights = grid_values.stroke_weight;
+                if (grid_values.sub_shape != 1)
+                    concentric_sub_stroke_weights = Templates.ant_attribute_templates[0].sub_shape.stroke_weights
+
+                let local_radius = radius
+                // let base_triangle = new paper.Path();
+                // base_triangle.strokeWidth = 0
+                // base_triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y - local_radius));
+                // base_triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
+                // base_triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
+                grid_values.rotation.sort(() => Math.random() - 0.5)
+                grid_values.rotation.map((rot) => {
+                    concentric_sub_stroke_weights.map((sw) => {
+                        local_radius = radius * sw
+                        let triangle = new paper.Path();
+                        triangle.strokeWidth = 0
+                        triangle.fillColor = this.color_machine(Math.random()).hex();
+                        triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y - local_radius));
+                        triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
+                        triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
+                        triangle.rotate(rot, local_origin)
+
+                    });
+                });
             }
         }
     }
@@ -160,4 +207,8 @@ function makeid(length) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
+}
+
+function round(value, decimals) {
+    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
 }

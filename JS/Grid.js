@@ -12,42 +12,54 @@ class Grid {
         this.SetupRules()
         this.SpawnAnts()
         this.InitializeGrids()
+
     }
 
     InitializeGrids() {
-        this.grids = {}
-        switch (this.params.step_shape.name) {
-            case 'square':
-                this.grids['color'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill({ a: 0, b: 0 }));
-                this.grids['sub_shape'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill(1));
-                this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill([]));
-                this.grids['rotation'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill([]));
-                break;
-            case 'circle':
-                this.grids['color'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill(0));
-                this.grids['sub_shape'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill(1));
-                this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill([]));
-                this.grids['rotation'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill([]));
-                break;
-            case 'triangle':
-                this.grids['color'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill(0));
-                this.grids['sub_shape'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill(1));
-                this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill([]));
-                this.grids['rotation'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill([]));
-                break;
-        }
+        this.grid = new Array(this.params.grid_size.x).fill()
+            .map(() => new Array(this.params.grid_size.y).fill({
+                rule: 0,
+                color: [0, 0],
+                sub_shape: 1,
+                stroke_weight: [],
+                rotation: [],
+            }));
+
+        /*
+    this.grids = {}
+    switch (this.params.step_shape.name) {
+        case 'square':
+            this.grids['color'] = new Array(this.params.grid_size.x).fill()
+                .map(() => new Array(this.params.grid_size.y).fill({ a: 0, b: 0 }));
+            this.grids['sub_shape'] = new Array(this.params.grid_size.x).fill()
+                .map(() => new Array(this.params.grid_size.y).fill(1));
+            this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
+                .map(() => new Array(this.params.grid_size.y).fill([]));
+            this.grids['rotation'] = new Array(this.params.grid_size.x).fill()
+                .map(() => new Array(this.params.grid_size.y).fill([]));
+            break;
+        case 'circle':
+            this.grids['color'] = new Array(this.params.grid_size.x).fill()
+                .map(() => new Array(this.params.grid_size.y).fill(0));
+            this.grids['sub_shape'] = new Array(this.params.grid_size.x).fill()
+                .map(() => new Array(this.params.grid_size.y).fill(1));
+            this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
+                .map(() => new Array(this.params.grid_size.y).fill([]));
+            this.grids['rotation'] = new Array(this.params.grid_size.x).fill()
+                .map(() => new Array(this.params.grid_size.y).fill([]));
+            break;
+        case 'triangle':
+            this.grids['color'] = new Array(this.params.grid_size.x).fill()
+                .map(() => new Array(this.params.grid_size.y).fill(0));
+            this.grids['sub_shape'] = new Array(this.params.grid_size.x).fill()
+                .map(() => new Array(this.params.grid_size.y).fill(1));
+            this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
+                .map(() => new Array(this.params.grid_size.y).fill([]));
+            this.grids['rotation'] = new Array(this.params.grid_size.x).fill()
+                .map(() => new Array(this.params.grid_size.y).fill([]));
+            break;
+    }
+    */
     }
 
     SetupRules() {
@@ -79,8 +91,7 @@ class Grid {
     }
 
     SpawnAnts() {
-        let ant_attributes = Templates.ant_attribute_templates[this.params.step_shape.id]
-        // console.log('ant attributes 32321', ant_attributes.stroke_weight)
+        let ant_attributes = Templates.ant_attributes
         for (let i = 0; i < this.params.ant_count; i++) {
             let default_attributes = {
                 id: i,
@@ -90,7 +101,7 @@ class Grid {
                 y: this.params.ant_origins_random ?
                     Math.floor(Math.random() * this.params.grid_size.y) :
                     Math.floor(this.params.grid_size.y / 2),
-                rule_indexes: this.RandRuleset(ant_attributes.color.state_count),
+                rule_indexes: this.RandRuleset(ant_attributes.color.max_state),
                 direction: 0,
                 step_count: 0,
                 step_size: 1,//move only one in each direction
@@ -118,13 +129,15 @@ class Grid {
     WalkAnts(steps) {
         for (let i = 0; i < steps; i++) {
             this.ants.map((ant) => {
-                let step_value = this.grids['color'][ant.x][ant.y].a
-                this.all_rules[ant.rule_indexes[step_value]](ant)
+
+                let rule_value = this.grid[ant.x][ant.y].rule
+                console.log('rule value', rule_value)
+                this.all_rules[ant.rule_indexes[rule_value]](ant)
                 this.UpdateAnt(ant)
-                this.UpdateGrids(ant)
+                this.UpdateGrid(ant)
             })
         }
-        return this.grids
+        return this.grid
     }
 
     UpdateAnt(ant) {
@@ -151,7 +164,26 @@ class Grid {
         ant.step_count++
     }
 
-    UpdateGrids(ant) {
+    UpdateGrid(ant) {
+
+        console.log('tile max state', ant.color.max_state)
+        this.grid[ant.x][ant.y].rule = (this.grid[ant.x][ant.y].rule + 1) % ant.color.max_state
+        Math.random() > 0.5 ?
+            this.grid[ant.x][ant.y].color[0] = (this.grid[ant.x][ant.y].rule + 1) % ant.color.max_color :
+            this.grid[ant.x][ant.y].color[1] = (this.grid[ant.x][ant.y].rule + 1) % ant.color.max_color
+        this.grid[ant.x][ant.y].sub_shape = ant.sub_shape.values[ant.sub_shape.index]
+        // this.grids[ant.x][ant.y].rotation[0]
+
+        console.log('chet', ant.stroke_weight.values[ant.stroke_weight.index], ant.stroke_weight.index)
+        if (this.grid[ant.x][ant.y].stroke_weight.indexOf(ant.stroke_weight.values[ant.stroke_weight.index]) == -1)
+            this.grid[ant.x][ant.y].stroke_weight.push(ant.stroke_weight.values[ant.stroke_weight.index])
+
+        let value = (Math.round(ant.rotation.value * 100) / 100)
+        if (this.grid[ant.x][ant.y].rotation.indexOf(value) == -1) {
+            // console.log('rotation value', value, this.grids[type][ant.x][ant.y].indexOf(value))
+            this.grid[ant.x][ant.y].rotation.push(value);
+        }
+        /*
         let grids = Object.keys(this.grids)
         grids.map((type) => {
             // console.log('type', type, ant)
@@ -179,6 +211,7 @@ class Grid {
                 }
             }
         })
+        */
 
     }
 

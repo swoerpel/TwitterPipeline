@@ -5,13 +5,6 @@ var consts = {
     DOWN: 3,
 }
 
-var MAX_STEPS_PER_DRAW = 5
-const MAX_ANT_STEP_SIZE = 10
-// all new ants spawned will use master color palette
-const DEF_COLOR_PALETTE = true // all ants share default pallete
-const CYCLE_PALETTES = true // cycle of random group, or always random,
-
-
 var rule_templates = [
     { //square
         turnRight: true,
@@ -19,8 +12,8 @@ var rule_templates = [
         goStraight: true,
         incStrokeWeight: true,
         decStrokeWeight: true,
-        incRotation: false,
-        decRotation: false,
+        incRotation: true,
+        decRotation: true,
         incStepSize: false,
         decStepSize: false,
         incSubShapes: true,
@@ -78,8 +71,8 @@ var stroke_weight_templates = [
 
 
 var color_attributes = {
-    state_count: 150,
-    color_count: 150,
+    max_state: 150,
+    max_color: 150,
     increment_value: 1,
 
     //0 - random
@@ -93,40 +86,26 @@ var color_attributes = {
 var sub_shape_attributes = {
     index: 0,
     values: [1, 2, 4],
-    stroke_weights: [1, .5],
+    stroke_weights: [1,],
 }
 
 var rotation_attributes = {
     // index:
     value: 0,
-    delta: 45, //Math.PI / 2
+    delta: 90, //Math.PI / 2
 }
 
 // ARRAY
-var ant_attribute_templates = [
-    { //square
-        color: color_attributes,
-        sub_shape: sub_shape_attributes,
-        rotation: rotation_attributes
-        // stroke_weight: stroke_weight_attributes
-    },
-    { //circle
-        color: color_attributes,
-        sub_shape: sub_shape_attributes,
-        rotation: rotation_attributes
-        // stroke_weight: stroke_weight_attributes,
-    },
-    { //triangle
-        color: color_attributes,
-        sub_shape: sub_shape_attributes,
-        // stroke_weight: stroke_weight_attributes,
-        rotation: rotation_attributes
-    }
-]
+var ant_attributes = { //square
+    color: color_attributes,
+    sub_shape: sub_shape_attributes,
+    rotation: rotation_attributes
+    // stroke_weight: stroke_weight_attributes
+}
 
 exports.rule_templates = rule_templates;
 exports.grid_sizes = grid_sizes;
 exports.step_shapes = step_shapes;
 exports.stroke_weight_templates = stroke_weight_templates;
-exports.ant_attribute_templates = ant_attribute_templates;
+exports.ant_attributes = ant_attributes;
 exports.consts = consts

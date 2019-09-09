@@ -58,7 +58,7 @@ class MasterController {
         return relative_path
     }
 
-    DrawGrids(grid_layers) {
+    DrawGrids(grid_values) {
         console.log('vital params', this.vital_params)
         for (let i = 0; i < this.vital_params.grid_size.x; i++) {
             for (let j = 0; j < this.vital_params.grid_size.y; j++) {
@@ -66,20 +66,21 @@ class MasterController {
                     x: this.paper_width / this.vital_params.grid_size.x * i,
                     y: this.paper_height / this.vital_params.grid_size.y * j
                 }
-                let grid_values = {
-                    origin: origin,
-                    width: this.paper_width / this.vital_params.grid_size.x,
-                    color: grid_layers.color[i][j],
-                    sub_shape: grid_layers.sub_shape[i][j],
-                    stroke_weight: grid_layers.stroke_weight[i][j],
-                    rotation: grid_layers.rotation[i][j]
-                }
-                if (this.vital_params.step_shape.name == 'square')
-                    this.DrawSquares(grid_values);
-                if (this.vital_params.step_shape.name == 'circle')
-                    this.DrawCircles(grid_values);
-                if (this.vital_params.step_shape.name == 'triangle')
-                    this.DrawTriangles(grid_values);
+                console.log('grid_values', grid_values[i][j])
+                // let grid_values = {
+                //     origin: origin,
+                //     width: this.paper_width / this.vital_params.grid_size.x,
+                //     color: grid_layers.color[i][j],
+                //     sub_shape: grid_layers.sub_shape[i][j],
+                //     stroke_weight: grid_layers.stroke_weight[i][j],
+                //     rotation: grid_layers.rotation[i][j]
+                // }
+                // if (this.vital_params.step_shape.name == 'square')
+                //     this.DrawSquares(grid_values);
+                // if (this.vital_params.step_shape.name == 'circle')
+                //     this.DrawCircles(grid_values);
+                // if (this.vital_params.step_shape.name == 'triangle')
+                //     this.DrawTriangles(grid_values);
             }
         }
     }

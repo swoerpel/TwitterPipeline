@@ -19,7 +19,7 @@ class Grid {
         switch (this.params.step_shape.name) {
             case 'square':
                 this.grids['color'] = new Array(this.params.grid_size.x).fill()
-                    .map(() => new Array(this.params.grid_size.y).fill(0));
+                    .map(() => new Array(this.params.grid_size.y).fill({ a: 0, b: 0 }));
                 this.grids['sub_shape'] = new Array(this.params.grid_size.x).fill()
                     .map(() => new Array(this.params.grid_size.y).fill(1));
                 this.grids['stroke_weight'] = new Array(this.params.grid_size.x).fill()
@@ -118,7 +118,7 @@ class Grid {
     WalkAnts(steps) {
         for (let i = 0; i < steps; i++) {
             this.ants.map((ant) => {
-                let step_value = this.grids['color'][ant.x][ant.y]
+                let step_value = this.grids['color'][ant.x][ant.y].a
                 this.all_rules[ant.rule_indexes[step_value]](ant)
                 this.UpdateAnt(ant)
                 this.UpdateGrids(ant)
@@ -155,9 +155,13 @@ class Grid {
         let grids = Object.keys(this.grids)
         grids.map((type) => {
             // console.log('type', type, ant)
+
             if (type === 'color') {
-                this.grids[type][ant.x][ant.y] =
-                    (this.grids[type][ant.x][ant.y] + ant.color.increment_value) % ant.color.color_count
+                Math.random() > 0.5 ?
+                    this.grids[type][ant.x][ant.y].a =
+                    (this.grids[type][ant.x][ant.y].a + ant.color.increment_value) % ant.color.color_count :
+                    this.grids[type][ant.x][ant.y].b =
+                    (this.grids[type][ant.x][ant.y].b + ant.color.increment_value) % ant.color.color_count
             }
             if (type === 'sub_shape') {
                 this.grids[type][ant.x][ant.y] = ant.sub_shape.values[ant.sub_shape.index]
@@ -231,7 +235,6 @@ var incRotation = (ant) => {
 var decRotation = (ant) => {
     ant.rotation.value = (ant.rotation.value - ant.rotation.delta) % 360
 }
-
 
 var incSubShapes = (ant) => {
     ant.sub_shape.index = (ant.sub_shape.index + 1) % ant.sub_shape.values.length

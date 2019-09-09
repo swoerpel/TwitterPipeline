@@ -85,12 +85,16 @@ class MasterController {
     }
 
     DrawSquares(grid_values) {
-
-        let color_ceil = round(grid_values.color / Templates.ant_attribute_templates[0].color.color_count, 3)// / grid_values.sub_shape;
-        let color_inc = round(color_ceil / grid_values.sub_shape, 3)
+        let color_center = round(grid_values.color.a / Templates.ant_attribute_templates[0].color.color_count, 3)// / grid_values.sub_shape;
+        if (grid_values.sub_shape == 1)
+            color_center = round(grid_values.color.b / Templates.ant_attribute_templates[0].color.color_count, 3)// / grid_values.sub_shape;
+        let color_inc = round(color_center / grid_values.sub_shape, 3)
         let color_count = 0;
-        console.log('color ceiling - color inc - grid_values.color')
-        console.log(color_ceil, color_inc, grid_values.color)
+        let color_values = new Array(grid_values.sub_shape).fill(0).map((n, i) => { i * color_inc })
+        // let color_values = Array.apply(null, {length: grid_values.sub_shape}).map(Function.call, color)
+        // let color_values = [...Array(grid_values.sub_shape)].map((n)=>{n})
+        // console.log('color ceiling - color inc - grid_values.color')
+        // console.log(color_ceil, color_inc, grid_values.color)
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k
@@ -105,10 +109,12 @@ class MasterController {
                 concentric_sub_stroke_weights.map((sw, index) => {
                     let con_size = new paper.Size(size.width, size.height);
                     let concentric_square = new paper.Path.Rectangle(local_origin, con_size);
+                    let color_val = Math.abs(round(randn_bm(-color_inc, color_inc, 1) * 10, 3))
+                    console.log(color_val)
                     concentric_square.fillColor = this.color_machine(
                         // Math.random()// * grid_values.color
                         // grid_values.color
-                        (color_count + 1) * color_inc
+                        color_val
                     ).hex();
                     color_count++;
                     concentric_square.scale(sw, concentric_square.bounds.center);
@@ -131,6 +137,7 @@ class MasterController {
                     concentric_sub_stroke_weights = Templates.ant_attribute_templates[0].sub_shape.stroke_weights
                 concentric_sub_stroke_weights.map((sw) => {
                     let concentric_circle = new paper.Path.Circle(local_origin, radius);
+
                     concentric_circle.fillColor = this.color_machine(
                         Math.random()// * grid_values.color
                     ).hex();
@@ -211,4 +218,19 @@ function makeid(length) {
 
 function round(value, decimals) {
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+}
+
+// Standard Normal variate using Box-Muller transform.
+function randn_bm(min, max, skew) {
+    var u = 0, v = 0;
+    while (u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+    while (v === 0) v = Math.random();
+    let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+
+    num = num / 10.0 + 0.5; // Translate to 0 -> 1
+    if (num > 1 || num < 0) num = randn_bm(min, max, skew); // resample between 0 and 1 if out of range
+    num = Math.pow(num, skew); // Skew
+    num *= max - min; // Stretch to fill range
+    num += min; // offset to min
+    return num;
 }

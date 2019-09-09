@@ -70,7 +70,7 @@ var step_shapes = [
 ]
 
 var stroke_weight_templates = [
-    [1, .5], //square
+    [1, .9, .8, .7, .6, .5], //square
     [1, .5, .25],//, 0.9, 0.8, 0.7, 0.6, 0.5], //circle
     [2, 1], //triangle
 ]
@@ -81,12 +81,19 @@ var color_attributes = {
     state_count: 150,
     color_count: 150,
     increment_value: 1,
+
+    //0 - random
+    //1 - random with center
+    //2 - gradient streaks
+    //3 - shuffled gradient
+    //4 - mini-ant
+    style: 0
 }
 
 var sub_shape_attributes = {
     index: 0,
     values: [1, 2, 4],
-    stroke_weights: [1],
+    stroke_weights: [1, .5],
 }
 
 var rotation_attributes = {

@@ -23,6 +23,7 @@ class Grid {
                 sub_shape: 1,
                 stroke_weight: [],
                 rotation: [],
+                chet: 0,
             }));
 
         /*
@@ -115,6 +116,7 @@ class Grid {
             let ant = { ...default_attributes, ...ant_attributes, }
             this.ants.push(ant)
         }
+        console.log('ants', this.ants)
     }
 
     RandRuleset(state_count) {
@@ -131,50 +133,94 @@ class Grid {
             this.ants.map((ant) => {
 
                 let rule_value = this.grid[ant.x][ant.y].rule
-                console.log('rule value', rule_value)
+                this.grid[ant.x][ant.y].rule = (this.grid[ant.x][ant.y].rule + 1) % ant.color.max_state
+                // console.log('rule value', rule_value)
                 this.all_rules[ant.rule_indexes[rule_value]](ant)
                 this.UpdateAnt(ant)
                 this.UpdateGrid(ant)
             })
         }
+        console.log('subshape grid ')
+        for (let i = 0; i < this.params.grid_size.x; i++) {
+            let str = ""
+            for (let j = 0; j < this.params.grid_size.y; j++) {
+                // console.log(this.grid[i][j])
+                str += this.grid[j][i].sub_shape.toString()
+            }
+            console.log(str)
+        }
+        console.log('rule grid ')
+        for (let i = 0; i < this.params.grid_size.x; i++) {
+            let str = ""
+            for (let j = 0; j < this.params.grid_size.y; j++) {
+                // console.log(this.grid[i][j])
+                str += (this.grid[j][i].rule.toString() + '  ')
+            }
+            console.log(str)
+        }
+        console.log('chet grid ')
+        for (let i = 0; i < this.params.grid_size.x; i++) {
+            let str = ""
+            for (let j = 0; j < this.params.grid_size.y; j++) {
+                // console.log(this.grid[i][j])
+                str += (this.grid[j][i].chet.toString() + '  ')
+            }
+            console.log(str)
+        }
         return this.grid
     }
 
     UpdateAnt(ant) {
+        // console.log(Templates.consts)
         if (ant.direction == Templates.consts.UP) {
-            ant.y += ant.step_size;
+            ant.y = (ant.y + ant.step_size) % this.params.grid_size.y;
         } else if (ant.direction == Templates.consts.RIGHT) {
-            ant.x += ant.step_size;
+            ant.x = (ant.x + ant.step_size) % this.params.grid_size.x;
+            // ant.x += ant.step_size;
         } else if (ant.direction == Templates.consts.DOWN) {
-            ant.y -= ant.step_size;
+            ant.y = (ant.y - ant.step_size);
+            if (ant.y < 0)
+                ant.y = this.params.grid_size.y - 1
+            // ant.y -= ant.step_size;
         } else if (ant.direction == Templates.consts.LEFT) {
-            ant.x -= ant.step_size;
+            ant.x = (ant.x - ant.step_size);
+            if (ant.x < 0)
+                ant.x = this.params.grid_size.x - 1
+            // ant.x -= ant.step_size;
         }
 
-        if (ant.x > this.params.grid_size.x - 1) {
-            ant.x = 0;
-        } else if (ant.x < 0) {
-            ant.x = this.params.grid_size.x - 1;
+        // if (ant.x > this.params.grid_size.x - 1) {
+        //     ant.x = 0;
+        // } else if (ant.x < 0) {
+        //     ant.x = this.params.grid_size.x - 1;
 
-        } if (ant.y > this.params.grid_size.y - 1) {
-            ant.y = 0;
-        } else if (ant.y < 0) {
-            ant.y = this.params.grid_size.y - 1;
-        }
+        // } if (ant.y > this.params.grid_size.y - 1) {
+        //     ant.y = 0;
+        // } else if (ant.y < 0) {
+        //     ant.y = this.params.grid_size.y - 1;
+        // }
         ant.step_count++
     }
 
     UpdateGrid(ant) {
 
-        console.log('tile max state', ant.color.max_state)
-        this.grid[ant.x][ant.y].rule = (this.grid[ant.x][ant.y].rule + 1) % ant.color.max_state
-        Math.random() > 0.5 ?
-            this.grid[ant.x][ant.y].color[0] = (this.grid[ant.x][ant.y].rule + 1) % ant.color.max_color :
-            this.grid[ant.x][ant.y].color[1] = (this.grid[ant.x][ant.y].rule + 1) % ant.color.max_color
+        // console.log('tile max state', ant.color.max_state)
+        // this.grid[ant.x][ant.y].rule = (this.grid[ant.x][ant.y].rule + 1) % ant.color.max_state
+        if (Math.random() > 0.5)
+            this.grid[ant.x][ant.y].color[0] = (this.grid[ant.x][ant.y].color[0] + 1) % ant.color.max_color;
+        else
+            this.grid[ant.x][ant.y].color[1] = (this.grid[ant.x][ant.y].color[1] + 1) % ant.color.max_color;
+        // console.log('ant sub shape', ant.sub_shape.index, ant.x, ant.y)
+        // this.grid[ant.x][ant.y].sub_shape = Math.random()
+        // this.grid[ant.x][ant.y].sub_shape = ant.sub_shape.values[Math.round(Math.random() * ant.sub_shape.values.length)]
+        // this.grid[ant.x][ant.y].sub_shape = (this.grid[ant.x][ant.y].sub_shape + ant.sub_shape.index) % ant.sub_shape.values.length
         this.grid[ant.x][ant.y].sub_shape = ant.sub_shape.values[ant.sub_shape.index]
+        this.grid[ant.x][ant.y].chet = Math.round(Math.random() * 100)
+        // this.grid[ant.x][ant.y].sub_shape = ant.sub_shape.index
+        // console.log(ant.x, ant.y, this.grid[ant.x][ant.y].sub_shape)
         // this.grids[ant.x][ant.y].rotation[0]
-
-        console.log('chet', ant.stroke_weight.values[ant.stroke_weight.index], ant.stroke_weight.index)
+        // console.log('GRID', this.grid)
+        // console.log('chet', ant.stroke_weight.values[ant.stroke_weight.index], ant.stroke_weight.index)
         if (this.grid[ant.x][ant.y].stroke_weight.indexOf(ant.stroke_weight.values[ant.stroke_weight.index]) == -1)
             this.grid[ant.x][ant.y].stroke_weight.push(ant.stroke_weight.values[ant.stroke_weight.index])
 
@@ -222,15 +268,15 @@ class Grid {
 // ant methods
 var turnRight = (ant) => {
     ant.direction++;
-    if (ant.direction > Templates.consts.LEFT) {
-        ant.direction = Templates.consts.UP;
+    if (ant.direction > Templates.consts.DOWN) {
+        ant.direction = Templates.consts.RIGHT;
     }
 }
 
 var turnLeft = (ant) => {
     ant.direction--;
-    if (ant.direction < Templates.consts.UP) {
-        ant.direction = Templates.consts.LEFT;
+    if (ant.direction < Templates.consts.RIGHT) {
+        ant.direction = Templates.consts.DOWN;
     }
 }
 
@@ -270,13 +316,18 @@ var decRotation = (ant) => {
 }
 
 var incSubShapes = (ant) => {
+
     ant.sub_shape.index = (ant.sub_shape.index + 1) % ant.sub_shape.values.length
+    // console.log('inc sub shape', ant.sub_shape.index)
+    console.log(ant.sub_shape.index, 'inc sub shapes', ant.x, ant.y, ' -> ', ant.sub_shape.values[ant.sub_shape.index])
 }
 
 var decSubShapes = (ant) => {
-    (ant.sub_shape.index < 1) ?
+
+    ant.sub_shape.index <= 0 ?
         ant.sub_shape.index = ant.sub_shape.values.length - 1 :
         ant.sub_shape.index--
+    console.log(ant.sub_shape.index, 'dec sub shapes', ant.x, ant.y, ' -> ', ant.sub_shape.values[ant.sub_shape.index])
 }
 
 /*

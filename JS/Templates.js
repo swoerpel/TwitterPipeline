@@ -10,10 +10,10 @@ var rule_templates = [
         turnRight: true,
         turnLeft: true,
         goStraight: true,
-        incStrokeWeight: true,
-        decStrokeWeight: true,
-        incRotation: true,
-        decRotation: true,
+        incStrokeWeight: false,
+        decStrokeWeight: false,
+        incRotation: false,
+        decRotation: false,
         incStepSize: false,
         decStepSize: false,
         incSubShapes: true,
@@ -49,7 +49,7 @@ var rule_templates = [
 
 var grid_sizes = [
     { x: 2, y: 2 },
-    { x: 4 * 2, y: 4 },
+    { x: 4, y: 4 },
     { x: 8, y: 8 },
     { x: 16, y: 16 },
     { x: 32, y: 32 },
@@ -86,7 +86,7 @@ var color_attributes = {
 var sub_shape_attributes = {
     index: 0,
     values: [1, 2, 4],
-    stroke_weights: [1,],
+    stroke_weights: [1],
 }
 
 var rotation_attributes = {

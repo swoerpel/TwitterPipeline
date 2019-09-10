@@ -10,8 +10,8 @@ var rule_templates = [
         turnRight: true,
         turnLeft: true,
         goStraight: true,
-        incStrokeWeight: false,
-        decStrokeWeight: false,
+        incStrokeWeight: true,
+        decStrokeWeight: true,
         incRotation: false,
         decRotation: false,
         incStepSize: false,
@@ -86,7 +86,7 @@ var color_attributes = {
 var sub_shape_attributes = {
     index: 0,
     values: [1, 2, 4],
-    stroke_weights: [1],
+    stroke_weights: [1, .5],
 }
 
 var rotation_attributes = {

@@ -8,7 +8,7 @@ let loop = true;
 // 0: Square
 // 1: Circle
 // 2: Triangle
-let step_shape = 0;
+let step_shape = 1;
 
 let master_controller = new MasterController();
 while (loop) { //setInterval(4hrs)

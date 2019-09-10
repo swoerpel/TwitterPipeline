@@ -118,9 +118,9 @@ class MasterController {
                     let color_val = Math.abs(round(randn_bm(-color_inc, color_inc, 1) * 10, 3))
                     // console.log(color_val)
                     concentric_square.fillColor = this.color_machine(
-                        // Math.random()// * grid_values.color
+                        Math.random()// * grid_values.color
                         // grid_values.color
-                        color_val
+                        // color_val
                     ).hex();
                     color_count++;
                     concentric_square.scale(sw, concentric_square.bounds.center);

@@ -89,29 +89,32 @@ class MasterController {
 
     DrawSquares(grid_values) {
         let colors = [];
-        for (let i = 0; i < grid_values.color.length; i++)
+        for (let i = 0; i < grid_values.color.length; i++) {
             colors.push(round(grid_values.color[i] / Templates.ant_attributes.color.max_color, 3));
-        console.log('scaled colors', colors);
-        colors = colors.sort()
-        let color_range = Math.max(...colors) - Math.min(...colors);
-        let color_step = color_range / (grid_values.sub_shape - 1);
-        let available_colors = [];
+        }
+        // console.log('scaled colors', colors);
+        // colors = colors.sort()
+        // let color_ranges = colors.map((c) => { return [c, 1 - c] })//Math.max(...colors) - Math.min(...colors);
 
+        // console.log('color ranges ->', color_ranges)
+        // let color_step = colors[0] / (grid_values.sub_shape - 1);
+        // let available_colors = [];
 
+        // // console.log(round(color_ranges, 3), 'color ranges')
+        // console.log(round(color_step, 3), 'color step')
+        // for (let i = 0; i < grid_values.sub_shape; i++) {
+        //     // console.log('new color', i)
+        //     console.log(colors[0], 'color value')
+        //     console.log(colors[0] + (i) * color_step, 'pushed color')
+        //     available_colors.push(colors[0] + (i) * color_step)
+        // }
+        // console.log('ordered colors', available_colors, grid_values.sub_shape, color_step, color_range)
+        // available_colors = available_colors.map(a => [Math.random(), a]).sort((a, b) => a[0] - b[0]).map(a => a[1]);
+
+        // console.log('shuffled colors', available_colors)
+        let count = 0;
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
-                console.log(round(color_range, 3), 'color range')
-                console.log(round(color_step, 3), 'color step')
-                for (let i = 0; i < grid_values.sub_shape; i++) {
-                    // console.log('new color', i)
-                    console.log(colors[0], 'color value')
-                    console.log(colors[0] + (i) * color_step, 'pushed color')
-                    available_colors.push(colors[0] + (i) * color_step)
-                }
-                console.log('ordered colors', available_colors, grid_values.sub_shape, color_step, color_range)
-                // available_colors = available_colors.map(a => [Math.random(), a]).sort((a, b) => a[0] - b[0]).map(a => a[1]);
-
-                console.log('shuffled colors', available_colors)
                 let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k
                 let y_local_origin = grid_values.origin.y + grid_values.width / grid_values.sub_shape * l
                 let local_origin = new paper.Point(x_local_origin, y_local_origin);
@@ -125,12 +128,11 @@ class MasterController {
                 concentric_sub_stroke_weights.map((sw, index) => {
                     let con_size = new paper.Size(size.width, size.height);
                     let concentric_square = new paper.Path.Rectangle(local_origin, con_size);
-                    let color_val = colors[index % colors.length]
-                    // let color_val = randn_bm(Math.min(...colors), Math.max(...colors), 1)
+                    let color_val = randn_bm(0, 1, colors[count % colors.length])
+                    count++;
                     console.log(color_val, 'CV')
                     concentric_square.fillColor = this.color_machine(
-                        // Math.random()// * grid_values.color
-                        available_colors[Math.floor(Math.random() * available_colors.length)]
+                        color_val
                     ).hex();
                     concentric_square.scale(sw, concentric_square.bounds.center);
                 });

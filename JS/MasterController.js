@@ -68,7 +68,6 @@ class MasterController {
                     x: this.paper_width / this.vital_params.grid_size.x * i,
                     y: this.paper_height / this.vital_params.grid_size.y * j
                 }
-                console.log(i, j, 'sub shape grid values', grid[i][j].sub_shape)
                 let grid_values = {
                     origin: origin,
                     width: this.paper_width / this.vital_params.grid_size.x,
@@ -77,8 +76,6 @@ class MasterController {
                     stroke_weight: grid[i][j].stroke_weight,
                     rotation: grid[i][j].rotation
                 }
-                // console.log(i, j, grid_values.sub_shape)
-                console.log('CHETCHETCHET', grid_values.color, this.vital_params.step_shape.name)
 
                 if (this.vital_params.step_shape.name == 'square')
                     this.DrawSquares(grid_values);
@@ -91,50 +88,50 @@ class MasterController {
     }
 
     DrawSquares(grid_values) {
-        console.log('DAVEDAVEDAVE', grid_values.color)
         let colors = [];
         for (let i = 0; i < grid_values.color.length; i++)
             colors.push(round(grid_values.color[i] / Templates.ant_attributes.color.max_color, 3));
-        // let colors = grid_values.color.map((c) => {
-        // round(c / Templates.ant_attributes.color.max_color, 3)
-        // })
-        console.log('scaled colors', colors)
-        let color_center = round(grid_values.color[0] / Templates.ant_attributes.color.max_color, 3)// / grid_values.sub_shape;
-        if (grid_values.sub_shape == 1)
-            color_center = round(grid_values.color[1] / Templates.ant_attributes.color.max_color, 3)// / grid_values.sub_shape;
-        let color_inc = round(color_center / grid_values.sub_shape, 3)
-        let color_count = 0;
+        console.log('scaled colors', colors);
+        colors = colors.sort()
+        let color_range = Math.max(...colors) - Math.min(...colors);
+        let color_step = color_range / (grid_values.sub_shape - 1);
+        let available_colors = [];
 
-        // let color_values = new Array(grid_values.sub_shape).fill(0).map((n, i) => { i * color_inc })
-        // let color_values = Array.apply(null, {length: grid_values.sub_shape}).map(Function.call, color)
-        // let color_values = [...Array(grid_values.sub_shape)].map((n)=>{n})
-        // console.log('color ceiling - color inc - grid_values.color')
-        // console.log(color_ceil, color_inc, grid_values.color)
+
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
+                console.log(round(color_range, 3), 'color range')
+                console.log(round(color_step, 3), 'color step')
+                for (let i = 0; i < grid_values.sub_shape; i++) {
+                    // console.log('new color', i)
+                    console.log(colors[0], 'color value')
+                    console.log(colors[0] + (i) * color_step, 'pushed color')
+                    available_colors.push(colors[0] + (i) * color_step)
+                }
+                console.log('ordered colors', available_colors, grid_values.sub_shape, color_step, color_range)
+                // available_colors = available_colors.map(a => [Math.random(), a]).sort((a, b) => a[0] - b[0]).map(a => a[1]);
+
+                console.log('shuffled colors', available_colors)
                 let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k
                 let y_local_origin = grid_values.origin.y + grid_values.width / grid_values.sub_shape * l
                 let local_origin = new paper.Point(x_local_origin, y_local_origin);
                 let size = new paper.Size(grid_values.width / grid_values.sub_shape, grid_values.width / grid_values.sub_shape);
-                // let square = new paper.Path.Rectangle(local_origin, size);
-                // square.fillColor = this.color_machine(Math.random()).hex();
-                let concentric_sub_stroke_weights = grid_values.stroke_weight;
-                if (grid_values.sub_shape != 1)
+                let concentric_sub_stroke_weights;
+                if (grid_values.sub_shape == 1) {
+                    concentric_sub_stroke_weights = grid_values.stroke_weight;
+                } else {
                     concentric_sub_stroke_weights = Templates.ant_attributes.sub_shape.stroke_weights;
-                // console.log('k l', k, l, concentric_sub_stroke_weights)
-                // concentric_sub_stroke_weights = Templates.ant_attribute_templates[0].sub_shape.stroke_weights;
+                }
                 concentric_sub_stroke_weights.map((sw, index) => {
                     let con_size = new paper.Size(size.width, size.height);
                     let concentric_square = new paper.Path.Rectangle(local_origin, con_size);
-                    // let color_val = Math.abs(round(randn_bm(-color_inc, color_inc, 1) * 10, 3))
-                    let color_val = colors[Math.round(Math.random() * colors.length)]
-                    // console.log(color_val)
+                    let color_val = colors[index % colors.length]
+                    // let color_val = randn_bm(Math.min(...colors), Math.max(...colors), 1)
+                    console.log(color_val, 'CV')
                     concentric_square.fillColor = this.color_machine(
                         // Math.random()// * grid_values.color
-                        // grid_values.color
-                        color_val
+                        available_colors[Math.floor(Math.random() * available_colors.length)]
                     ).hex();
-                    color_count++;
                     concentric_square.scale(sw, concentric_square.bounds.center);
                 });
             }
@@ -212,9 +209,9 @@ class MasterController {
             rule_template: Templates.rule_templates[step_shape],
             grid_size: Templates.grid_sizes[1],
             stroke_weights: Templates.stroke_weight_templates[step_shape],
-            ant_count: 1,
+            ant_count: 5,
             ant_origins_random: true,
-            duration: 1000,
+            duration: 5000,
         }
         // console.log('vital_params.stroke_weights', vital_params.stroke_weights)
         return vital_params;

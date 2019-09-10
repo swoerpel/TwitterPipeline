@@ -268,16 +268,16 @@ class Grid {
 // ant methods
 var turnRight = (ant) => {
     ant.direction++;
-    if (ant.direction > Templates.consts.DOWN) {
-        ant.direction = Templates.consts.RIGHT;
-    }
+    // if (ant.direction > Templates.consts.DOWN) {
+    //     ant.direction = Templates.consts.RIGHT;
+    // }
 }
 
 var turnLeft = (ant) => {
     ant.direction--;
-    if (ant.direction < Templates.consts.RIGHT) {
-        ant.direction = Templates.consts.DOWN;
-    }
+    // if (ant.direction < Templates.consts.RIGHT) {
+    //     ant.direction = Templates.consts.DOWN;
+    // }
 }
 
 var goStraight = (ant) => {

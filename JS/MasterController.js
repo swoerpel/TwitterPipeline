@@ -5,16 +5,14 @@ var chroma = require('chroma-js');
 var Templates = require('./Templates.js');
 var Grid = require('./Grid.js');
 var svg2img = require('svg2img');
-var btoa = require('btoa');
 class MasterController {
     constructor() {
-        this.paper_width = 2400
-        this.paper_height = 2400
-        paper.setup(new paper.Size(this.paper_width, this.paper_height))
 
         // this.color_machine = chroma.scale(chroma.brewer.Greys)
-        this.color_machine = chroma.scale('RdBu')
+        // this.color_machine = chroma.scale('RdBu')
+        console.log(chroma.brewer)
         // this.color_machine = chroma.scale('Spectral')
+        this.color_machine = chroma.scale(['#fafa6e', '#2A4858']).mode('lch')
     }
 
     GenerateVitalParams(step_shape) {
@@ -24,7 +22,7 @@ class MasterController {
                 name: Templates.step_shapes[step_shape]
             },
             rule_template: Templates.rule_templates[step_shape],
-            grid_size: Templates.grid_sizes[1],
+            grid_size: Templates.grid_sizes[2],
             stroke_weights: Templates.stroke_weight_templates[step_shape],
             ant_count: 20,
             ant_origins_random: true,
@@ -34,6 +32,30 @@ class MasterController {
         // console.log('vital_params.stroke_weights', vital_params.stroke_weights)
         return vital_params;
     }
+
+    GenerateImage(step_shape) {
+        console.log('generating image...')
+        this.vital_params = this.GenerateVitalParams(step_shape)
+        this.paper_width = 1200 * this.vital_params.grid_size.x
+        this.paper_height = 1200 * this.vital_params.grid_size.y
+        paper.setup(new paper.Size(this.paper_width, this.paper_height))
+
+        console.log('vital params', this.vital_params)
+        let grid = new Grid(this.vital_params)
+        let grid_layers = grid.WalkAnts(this.vital_params.duration)
+        // console.log('grid layers', grid_layers)
+        this.DrawGrids(grid_layers)
+
+        let image_id = makeid(6).toString()
+        console.log('IMAGE ID: ', image_id)
+        // let relative_path = path.resolve('../images/')
+        let relative_path = path.resolve("../debug_images/")
+        let svg = this.ExportSVG(relative_path + image_id);
+        this.ExportPNG(svg, relative_path + '\\' + image_id);
+        return relative_path
+    }
+
+
 
     ExportSVG(relative_path) {
         relative_path = path.resolve("chez") // COMMENT OUT 
@@ -60,23 +82,7 @@ class MasterController {
 
     }
 
-    GenerateImage(step_shape) {
-        console.log('generating image...')
-        this.vital_params = this.GenerateVitalParams(step_shape)
-        console.log('vital params', this.vital_params)
-        let grid = new Grid(this.vital_params)
-        let grid_layers = grid.WalkAnts(this.vital_params.duration)
-        // console.log('grid layers', grid_layers)
-        this.DrawGrids(grid_layers)
 
-        let image_id = makeid(6).toString()
-        console.log('IMAGE ID: ', image_id)
-        // let relative_path = path.resolve('../images/')
-        let relative_path = path.resolve("../debug_images/")
-        let svg = this.ExportSVG(relative_path + image_id);
-        this.ExportPNG(svg, relative_path + '\\' + image_id);
-        return relative_path
-    }
 
     DrawGrids(grid) {
         console.log('vital params', this.vital_params)
@@ -97,8 +103,8 @@ class MasterController {
 
                 if (this.vital_params.step_shape.name == 'square')
                     this.DrawSquares(grid_values);
-                // if (this.vital_params.step_shape.name == 'circle')
-                //     this.DrawCircles(grid_values);
+                if (this.vital_params.step_shape.name == 'circle')
+                    this.DrawCircles(grid_values);
                 // if (this.vital_params.step_shape.name == 'triangle')
                 //     this.DrawTriangles(grid_values);
             }
@@ -107,31 +113,9 @@ class MasterController {
 
     DrawSquares(grid_values) {
         let colors = [];
-        console.log()
         for (let i = 0; i < grid_values.color.length; i++) {
             colors.push(round(grid_values.color[i] / Templates.ant_attributes.color.max_color, 3));
         }
-        console.log('scaled colors', colors);
-        // colors = colors.sort()
-        // let color_ranges = colors.map((c) => { return [c, 1 - c] })//Math.max(...colors) - Math.min(...colors);
-
-        // console.log('color ranges ->', color_ranges)
-        // let color_step = colors[0] / (grid_values.sub_shape - 1);
-        // let available_colors = [];
-
-        // // console.log(round(color_ranges, 3), 'color ranges')
-        // console.log(round(color_step, 3), 'color step')
-        // for (let i = 0; i < grid_values.sub_shape; i++) {
-        //     // console.log('new color', i)
-        //     console.log(colors[0], 'color value')
-        //     console.log(colors[0] + (i) * color_step, 'pushed color')
-        //     available_colors.push(colors[0] + (i) * color_step)
-        // }
-        // console.log('ordered colors', available_colors, grid_values.sub_shape, color_step, color_range)
-        // available_colors = available_colors.map(a => [Math.random(), a]).sort((a, b) => a[0] - b[0]).map(a => a[1]);
-
-        // console.log('shuffled colors', available_colors)
-        let count = 0;
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k
@@ -139,21 +123,16 @@ class MasterController {
                 let local_origin = new paper.Point(x_local_origin, y_local_origin);
                 let size = new paper.Size(grid_values.width / grid_values.sub_shape, grid_values.width / grid_values.sub_shape);
                 let concentric_sub_stroke_weights;
-                if (grid_values.sub_shape == 1) {
+                if (grid_values.sub_shape == 1)
                     concentric_sub_stroke_weights = grid_values.stroke_weight;
-                } else {
+                else
                     concentric_sub_stroke_weights = Templates.ant_attributes.sub_shape.stroke_weights;
-                }
+
                 concentric_sub_stroke_weights.map((sw, index) => {
                     let con_size = new paper.Size(size.width, size.height);
                     let concentric_square = new paper.Path.Rectangle(local_origin, con_size);
                     let color_val = colors[Math.floor(Math.random() * colors.length)]
-                    count++;
-                    console.log(color_val, 'CV')
-                    concentric_square.fillColor = this.color_machine(
-                        color_val
-                        // Math.random()
-                    ).hex();
+                    concentric_square.fillColor = this.color_machine(color_val).hex();
                     concentric_square.scale(sw, concentric_square.bounds.center);
                 });
             }
@@ -161,23 +140,27 @@ class MasterController {
     }
 
     DrawCircles(grid_values) {
+        let colors = [];
+        for (let i = 0; i < grid_values.color.length; i++) {
+            colors.push(round(grid_values.color[i] / Templates.ant_attributes.color.max_color, 3));
+        }
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let radius = grid_values.width / grid_values.sub_shape / 2
                 let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k + radius
                 let y_local_origin = grid_values.origin.y + grid_values.width / grid_values.sub_shape * l + radius
                 let local_origin = new paper.Point(x_local_origin, y_local_origin);
-                let circle = new paper.Path.Circle(local_origin, radius);
-                circle.fillColor = this.color_machine(Math.random()).hex();
-                let concentric_sub_stroke_weights = grid_values.stroke_weight;
-                if (grid_values.sub_shape != 1)
-                    concentric_sub_stroke_weights = Templates.ant_attribute_templates[0].sub_shape.stroke_weights
+                // let circle = new paper.Path.Circle(local_origin, radius);
+                // circle.fillColor = this.color_machine(Math.random()).hex();
+                let concentric_sub_stroke_weights;
+                if (grid_values.sub_shape == 1)
+                    concentric_sub_stroke_weights = grid_values.stroke_weight;
+                else
+                    concentric_sub_stroke_weights = Templates.ant_attributes.sub_shape.stroke_weights;
                 concentric_sub_stroke_weights.map((sw) => {
                     let concentric_circle = new paper.Path.Circle(local_origin, radius);
-
-                    concentric_circle.fillColor = this.color_machine(
-                        Math.random()// * grid_values.color
-                    ).hex();
+                    let color_val = colors[Math.floor(Math.random() * colors.length)]
+                    concentric_circle.fillColor = this.color_machine(color_val).hex();
                     concentric_circle.scale(sw, concentric_circle.bounds.center);
                 });
 

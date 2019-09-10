@@ -14,7 +14,25 @@ class MasterController {
 
         // this.color_machine = chroma.scale(chroma.brewer.Greys)
         this.color_machine = chroma.scale('RdBu')
-        // this.color_machine = chroma.scale('Spectrcon')
+        // this.color_machine = chroma.scale('Spectral')
+    }
+
+    GenerateVitalParams(step_shape) {
+        let vital_params = {
+            step_shape: {
+                id: step_shape,
+                name: Templates.step_shapes[step_shape]
+            },
+            rule_template: Templates.rule_templates[step_shape],
+            grid_size: Templates.grid_sizes[1],
+            stroke_weights: Templates.stroke_weight_templates[step_shape],
+            ant_count: 20,
+            ant_origins_random: true,
+            duration: 5000,
+            color_spread: 10,
+        }
+        // console.log('vital_params.stroke_weights', vital_params.stroke_weights)
+        return vital_params;
     }
 
     ExportSVG(relative_path) {
@@ -89,10 +107,11 @@ class MasterController {
 
     DrawSquares(grid_values) {
         let colors = [];
+        console.log()
         for (let i = 0; i < grid_values.color.length; i++) {
             colors.push(round(grid_values.color[i] / Templates.ant_attributes.color.max_color, 3));
         }
-        // console.log('scaled colors', colors);
+        console.log('scaled colors', colors);
         // colors = colors.sort()
         // let color_ranges = colors.map((c) => { return [c, 1 - c] })//Math.max(...colors) - Math.min(...colors);
 
@@ -128,11 +147,12 @@ class MasterController {
                 concentric_sub_stroke_weights.map((sw, index) => {
                     let con_size = new paper.Size(size.width, size.height);
                     let concentric_square = new paper.Path.Rectangle(local_origin, con_size);
-                    let color_val = randn_bm(0, 1, colors[count % colors.length])
+                    let color_val = colors[Math.floor(Math.random() * colors.length)]
                     count++;
                     console.log(color_val, 'CV')
                     concentric_square.fillColor = this.color_machine(
                         color_val
+                        // Math.random()
                     ).hex();
                     concentric_square.scale(sw, concentric_square.bounds.center);
                 });
@@ -200,23 +220,6 @@ class MasterController {
                 });
             }
         }
-    }
-
-    GenerateVitalParams(step_shape) {
-        let vital_params = {
-            step_shape: {
-                id: step_shape,
-                name: Templates.step_shapes[step_shape]
-            },
-            rule_template: Templates.rule_templates[step_shape],
-            grid_size: Templates.grid_sizes[1],
-            stroke_weights: Templates.stroke_weight_templates[step_shape],
-            ant_count: 5,
-            ant_origins_random: true,
-            duration: 5000,
-        }
-        // console.log('vital_params.stroke_weights', vital_params.stroke_weights)
-        return vital_params;
     }
 }
 

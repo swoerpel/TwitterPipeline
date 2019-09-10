@@ -63,7 +63,7 @@ var step_shapes = [
 ]
 
 var stroke_weight_templates = [
-    [1, .9, .8, .7, .6, .5], //square
+    [1, .9, .8, .7, .6, .5, .4, .3], //square
     [1, .5, .25],//, 0.9, 0.8, 0.7, 0.6, 0.5], //circle
     [2, 1], //triangle
 ]
@@ -71,9 +71,9 @@ var stroke_weight_templates = [
 
 
 var color_attributes = {
-    max_state: 150,
-    max_color: 150,
-    increment_value: 1,
+    max_state: 100,
+    max_color: 100,
+    max_inc: 50,
 
     //0 - random
     //1 - random with center
@@ -86,7 +86,7 @@ var color_attributes = {
 var sub_shape_attributes = {
     index: 0,
     values: [1, 2, 4],
-    stroke_weights: [1, .5],
+    stroke_weights: [1, .75, .5],
 }
 
 var rotation_attributes = {

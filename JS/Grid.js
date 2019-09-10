@@ -16,7 +16,7 @@ class Grid {
         this.grid = new Array(this.params.grid_size.x).fill()
             .map(() => new Array(this.params.grid_size.y).fill({
                 rule: 0,
-                color: [0, 0, 0],
+                color: new Array(this.params.color_spread).fill(0),// [0, 0, 0, 0, 0, 0, 0],
                 sub_shape: 1,
                 stroke_weight: [],
                 rotation: [],
@@ -69,9 +69,11 @@ class Grid {
                 stroke_weight: {
                     index: 0,
                     values: this.params.stroke_weights,
-                }
+                },
+                tile_inc: Math.ceil(Math.random() * ant_attributes.color.max_inc)
             }
             let ant = { ...default_attributes, ...ant_attributes, }
+            console.log('ANT - ', i, ant)
             this.ants.push(ant)
         }
     }
@@ -129,7 +131,7 @@ class Grid {
         let color_array = [...this.grid[ant.x][ant.y].color];
 
         let rand_index = Math.floor(Math.random() * color_array.length)
-        color_array[rand_index] = (color_array[rand_index] + 1) % ant.color.max_color
+        color_array[rand_index] = (color_array[rand_index] + ant.tile_inc) % ant.color.max_color
         this.grid[ant.x][ant.y] = {
             rule: rule,
             sub_shape: sub_shape,

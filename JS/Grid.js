@@ -16,7 +16,7 @@ class Grid {
         this.grid = new Array(this.params.grid_size.x).fill()
             .map(() => new Array(this.params.grid_size.y).fill({
                 rule: 0,
-                color: 0,//[0, 0],
+                color: [0, 0, 0],
                 sub_shape: 1,
                 stroke_weight: [],
                 rotation: [],
@@ -115,6 +115,7 @@ class Grid {
     }
 
     UpdateGrid(ant) {
+        let rule = (this.grid[ant.x][ant.y].rule + 1) % ant.color.max_state
         let sub_shape = ant.sub_shape.values[ant.sub_shape.index]
         let stroke_weight_array = [...this.grid[ant.x][ant.y].stroke_weight];
         if (stroke_weight_array.indexOf(ant.stroke_weight.values[ant.stroke_weight.index]) == -1)
@@ -125,10 +126,14 @@ class Grid {
         if (rotation_array.indexOf(value) == -1)
             rotation_array.push(value);
 
+        let color_array = [...this.grid[ant.x][ant.y].color];
+
+        let rand_index = Math.floor(Math.random() * color_array.length)
+        color_array[rand_index] = (color_array[rand_index] + 1) % ant.color.max_color
         this.grid[ant.x][ant.y] = {
-            rule: (this.grid[ant.x][ant.y].rule + 1) % ant.color.max_state,
+            rule: rule,
             sub_shape: sub_shape,
-            color: (this.grid[ant.x][ant.y].color + 1) % ant.color.max_color,
+            color: color_array,
             stroke_weight: stroke_weight_array,
             rotation: rotation_array,
         }

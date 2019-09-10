@@ -78,6 +78,8 @@ class MasterController {
                     rotation: grid[i][j].rotation
                 }
                 // console.log(i, j, grid_values.sub_shape)
+                console.log('CHETCHETCHET', grid_values.color, this.vital_params.step_shape.name)
+
                 if (this.vital_params.step_shape.name == 'square')
                     this.DrawSquares(grid_values);
                 // if (this.vital_params.step_shape.name == 'circle')
@@ -89,11 +91,20 @@ class MasterController {
     }
 
     DrawSquares(grid_values) {
+        console.log('DAVEDAVEDAVE', grid_values.color)
+        let colors = [];
+        for (let i = 0; i < grid_values.color.length; i++)
+            colors.push(round(grid_values.color[i] / Templates.ant_attributes.color.max_color, 3));
+        // let colors = grid_values.color.map((c) => {
+        // round(c / Templates.ant_attributes.color.max_color, 3)
+        // })
+        console.log('scaled colors', colors)
         let color_center = round(grid_values.color[0] / Templates.ant_attributes.color.max_color, 3)// / grid_values.sub_shape;
         if (grid_values.sub_shape == 1)
             color_center = round(grid_values.color[1] / Templates.ant_attributes.color.max_color, 3)// / grid_values.sub_shape;
         let color_inc = round(color_center / grid_values.sub_shape, 3)
         let color_count = 0;
+
         // let color_values = new Array(grid_values.sub_shape).fill(0).map((n, i) => { i * color_inc })
         // let color_values = Array.apply(null, {length: grid_values.sub_shape}).map(Function.call, color)
         // let color_values = [...Array(grid_values.sub_shape)].map((n)=>{n})
@@ -115,12 +126,13 @@ class MasterController {
                 concentric_sub_stroke_weights.map((sw, index) => {
                     let con_size = new paper.Size(size.width, size.height);
                     let concentric_square = new paper.Path.Rectangle(local_origin, con_size);
-                    let color_val = Math.abs(round(randn_bm(-color_inc, color_inc, 1) * 10, 3))
+                    // let color_val = Math.abs(round(randn_bm(-color_inc, color_inc, 1) * 10, 3))
+                    let color_val = colors[Math.round(Math.random() * colors.length)]
                     // console.log(color_val)
                     concentric_square.fillColor = this.color_machine(
-                        Math.random()// * grid_values.color
+                        // Math.random()// * grid_values.color
                         // grid_values.color
-                        // color_val
+                        color_val
                     ).hex();
                     color_count++;
                     concentric_square.scale(sw, concentric_square.bounds.center);

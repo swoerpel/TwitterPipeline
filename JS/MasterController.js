@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var paper = require('paper-jsdom-canvas');
+var fake = require('fake-words');
 var Templates = require('./Templates.js');
 var Grid = require('./Grid.js');
 var svg2img = require('svg2img');
@@ -223,7 +224,8 @@ function makeid(length) {
     for (var i = 0; i < length; i++) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-    return result;
+    // return result;
+    return fake.word();
 }
 
 function round(value, decimals) {

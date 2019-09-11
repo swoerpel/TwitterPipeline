@@ -48,12 +48,12 @@ var rule_templates = [
 ]
 
 var grid_sizes = [
-    { x: 2 * 2, y: 2 },
+    { x: 2, y: 2 },
     { x: 4 * 2, y: 4 },
-    { x: 8 * 2, y: 8 },
-    { x: 16 * 2, y: 16 },
-    { x: 32 * 2, y: 32 },
-    { x: 64 * 2, y: 64 },
+    { x: 8, y: 8 },
+    { x: 16, y: 16 },
+    // { x: 32, y: 32 },
+    // { x: 64, y: 64 },
 ]
 
 var step_shapes = [
@@ -63,9 +63,9 @@ var step_shapes = [
 ]
 
 var stroke_weight_templates = [
-    [1, .9, .8, .7, .6, .5, .4, .3], //square
+    [2, 1, .9, .8, .7, .6, .5,], //square
     [1, .9, .8, .7, .6, .5, .4, .3],//, 0.9, 0.8, 0.7, 0.6, 0.5], //circle
-    [2, 1], //triangle
+    [2, 1, .75, .5], //triangle
 ]
 
 
@@ -85,8 +85,8 @@ var color_attributes = {
 
 var sub_shape_attributes = {
     index: 0,
-    values: [1, 2, 4],
-    stroke_weights: [1, .75, .5],
+    values: [1, 2],
+    stroke_weights: [1, .5],
 }
 
 var rotation_attributes = {

@@ -48,7 +48,7 @@ class Grid {
         if (this.params.rule_template.decSubShapes)
             this.all_rules.push((ant) => decSubShapes(ant))
         // this.all_rules.length
-        console.log('all rules', this.all_rules, this.all_rules.length, this.params.step_shape.name)
+        // console.log('all rules', this.all_rules, this.all_rules.length, this.params.step_shape.name)
     }
 
     SpawnAnts() {
@@ -73,7 +73,7 @@ class Grid {
                 tile_inc: Math.ceil(Math.random() * ant_attributes.color.max_inc)
             }
             let ant = { ...default_attributes, ...ant_attributes, }
-            console.log('ANT - ', i, ant)
+            // console.log('ANT - ', i, ant)
             this.ants.push(ant)
         }
     }

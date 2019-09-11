@@ -5,19 +5,16 @@ var Templates = require('./Templates.js');
 var Grid = require('./Grid.js');
 var svg2img = require('svg2img');
 class MasterController {
-    constructor(svg_path, png_path) {
+    constructor() {
+
+    }
+
+    SetPaths(svg_path, png_path) {
         this.paths = {
             svg: svg_path,
             png: png_path
         }
-        // this.color_machine = chroma.scale(chroma.brewer.Greys)
-        // this.color_machine = chroma.scale('RdBu')
-        // console.log(chroma.brewer)
-        // this.color_machine = chroma.scale('blues')
-        // this.color_machine = chroma.scale('Spectral')
-        // this.color_machine = chroma.scale(['#fafa6e', '#2A4858']).mode('lch')
     }
-
     GenerateVitalParams(step_shape) {
         let vital_params = {
             step_shape: {
@@ -69,6 +66,8 @@ class MasterController {
     ExportSVG(svg, image_id) {
         // let path = path.resolve("chez") // COMMENT OUT 
         let path = this.paths.svg;
+        if (path.includes('Debug'))
+            image_id = 'chez'
         path += (image_id + '.svg');
         fs.writeFile(path, svg, function (err) {
             if (err) throw err;

@@ -15,7 +15,7 @@ iteration_time *= 1000; //miliseconds
 let master_controller = new MasterController();
 let palettes = Object.keys(chroma.brewer)
 let counter = 0;
-let live_tweeting = false;
+let live_tweeting = true;
 if (live_tweeting) {
     master_controller.SetPaths(svg_path, png_path)
     setInterval(() => {
@@ -30,10 +30,20 @@ if (live_tweeting) {
         try {
             fs.readdir(png_path, (err, files) => {
                 master_controller.GenerateImage(rand_shape, color_machine);
-                let random_image_index = Math.round(Math.random() * files.length)
+                let random_image_index = Math.floor(Math.random() * files.length)
                 let image_name = files[random_image_index]
+                // console.log(files, image_name, !image_name.includes('posted'))
+                while (image_name.includes('posted')) {
+                    random_image_index = Math.round(Math.random() * files.length)
+                    image_name = files[random_image_index]
+                }
+
                 console.log('posting tweet at ', timestamp)
-                TweetImage(png_path + image_name);
+                TweetImage(png_path + image_name, image_name);
+                new_image_name = image_name.replace(/\..+$/, '_posted.png');
+                fs.rename(png_path + image_name, png_path + new_image_name, function (err) {
+                    if (err) console.log('ERROR: ' + err);
+                });
             });
         }
         catch (error) {
@@ -49,7 +59,7 @@ else {
 }
 
 
-function TweetImage(img_path) {
+function TweetImage(img_path, image_name) {
     var T = new Twit(config);
     var b64content = fs.readFileSync(img_path, { encoding: 'base64' });
     console.log('posting image from', img_path);
@@ -60,6 +70,7 @@ function TweetImage(img_path) {
         else {
             console.log('Image uploaded! \n Now tweeting it...');
             T.post('statuses/update', {
+                status: image_name.replace(/\..+$/, ''),
                 media_ids: new Array(data.media_id_string)
             },
                 function (err, data, response) {

@@ -2,9 +2,12 @@ var fs = require('fs');
 var path = require('path');
 var paper = require('paper-jsdom-canvas');
 var fake = require('fake-words');
+var svg2img = require('svg2img');
 var Templates = require('./Templates.js');
 var Grid = require('./Grid.js');
-var svg2img = require('svg2img');
+var ColorSequencer = require('./ColorSequencer.js');
+
+
 class MasterController {
     constructor() {
 
@@ -16,6 +19,11 @@ class MasterController {
             png: png_path
         }
     }
+
+    SetStepShape(step_shape) {
+        this.step_shape = step_shape;
+    }
+
     GenerateVitalParams(step_shape) {
         let vital_params = {
             step_shape: {
@@ -34,14 +42,15 @@ class MasterController {
         return vital_params;
     }
 
-    GenerateImage(step_shape, color_machine) {
+    GenerateImage(color_machine) {
         this.color_machine = color_machine;
         console.log('generating new image...')
-        this.vital_params = this.GenerateVitalParams(step_shape)
+        this.vital_params = this.GenerateVitalParams(this.step_shape)
         this.paper_width = 600 * this.vital_params.grid_size.x
         this.paper_height = 600 * this.vital_params.grid_size.y
         paper.setup(new paper.Size(this.paper_width, this.paper_height))
-
+        this.DrawBackground()
+        // this.DrawBackground(color_machine(Math.random()).hex())
         // console.log('vital params', this.vital_params)
         let grid = new Grid(this.vital_params)
         let grid_layers = grid.WalkAnts(this.vital_params.duration)
@@ -64,30 +73,13 @@ class MasterController {
 
 
 
-    ExportSVG(svg, image_id) {
-        // let path = path.resolve("chez") // COMMENT OUT 
-        let path = this.paths.svg;
-        if (path.includes('Debug'))
-            image_id = 'chez'
-        path += (image_id + '.svg');
-        fs.writeFile(path, svg, function (err) {
-            if (err) throw err;
-            console.log('SVG saved at', path)
-        });
+    SetRotation(rotation) {
+        Templates.ant_attributes.rotation.delta = rotation;
     }
 
-    ExportPNG(svg, image_id) {
-        let path = this.paths.png;
-        path += (image_id + '.png');
-        svg2img(svg, function (error, buffer) {
-            fs.writeFileSync(path, buffer);
-        });
-        console.log('PNG saved at', path)
-        return path
+    SetStrokeWeight(sw) {
+        Templates.stroke_weight_templates[0] = sw;
     }
-
-
-
     DrawGrids(grid) {
         // console.log('vital params', this.vital_params)
         for (let i = 0; i < this.vital_params.grid_size.x; i++) {
@@ -104,22 +96,38 @@ class MasterController {
                     stroke_weight: grid[i][j].stroke_weight,
                     rotation: grid[i][j].rotation
                 }
+                let colors = this.SetColors(Templates.ant_attributes.color.style, grid_values.color)
 
                 if (this.vital_params.step_shape.name == 'square')
-                    this.DrawSquares(grid_values);
+                    this.DrawSquares(grid_values, colors);
                 if (this.vital_params.step_shape.name == 'circle')
-                    this.DrawCircles(grid_values);
+                    this.DrawCircles(grid_values, colors);
                 if (this.vital_params.step_shape.name == 'triangle')
-                    this.DrawTriangles(grid_values);
+                    this.DrawTriangles(grid_values, colors);
             }
         }
     }
 
-    DrawSquares(grid_values) {
-        let colors = [];
-        for (let i = 0; i < grid_values.color.length; i++) {
-            colors.push(round(grid_values.color[i] / Templates.ant_attributes.color.max_color, 3));
+    SetColors(index, color_grid) {
+        let colors = []
+        if (index == 0) { // 
+            for (let k = 0; k < color_grid.length; k++)
+                colors.push(round(color_grid[k] / Templates.ant_attributes.color.max_color, 3));
+        } else if (index == 1) {
+            let C = new ColorSequencer()
+            colors = C.NewSequence('trapped knight')
+        } else {
+            for (let k = 0; k < color_grid.length; k++)
+                colors.push(Math.random());
         }
+
+        //remove later, just for debugging
+        for (let k = 0; k < color_grid.length; k++)
+            colors.push(Math.random());
+        return colors
+    }
+
+    DrawSquares(grid_values, colors) {
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k
@@ -143,10 +151,7 @@ class MasterController {
         }
     }
 
-    DrawCircles(grid_values) {
-        let colors = [];
-        for (let i = 0; i < grid_values.color.length; i++)
-            colors.push(round(grid_values.color[i] / Templates.ant_attributes.color.max_color, 3));
+    DrawCircles(grid_values, colors) {
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let radius = grid_values.width / grid_values.sub_shape / 2
@@ -170,10 +175,7 @@ class MasterController {
         }
     }
 
-    DrawTriangles(grid_values) {
-        let colors = [];
-        for (let i = 0; i < grid_values.color.length; i++)
-            colors.push(round(grid_values.color[i] / Templates.ant_attributes.color.max_color, 3));
+    DrawTriangles(grid_values, colors) {
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let radius = grid_values.width / grid_values.sub_shape / 2
@@ -212,6 +214,40 @@ class MasterController {
             }
         }
     }
+
+    DrawBackground(color = 'black') {
+        var rect = new paper.Path.Rectangle({
+            point: [0, 0],
+            size: [paper.view.size.width, paper.view.size.height],
+            strokeColor: 'black',
+            selected: true
+        });
+        rect.sendToBack();
+        rect.fillColor = color;
+    }
+
+    ExportSVG(svg, image_id) {
+        // let path = path.resolve("chez") // COMMENT OUT 
+        let path = this.paths.svg;
+        if (path.includes('Debug'))
+            image_id = 'chez'
+        path += (image_id + '.svg');
+        fs.writeFile(path, svg, function (err) {
+            if (err) throw err;
+            console.log('SVG saved at', path)
+        });
+    }
+
+    ExportPNG(svg, image_id) {
+        let path = this.paths.png;
+        path += (image_id + '.png');
+        svg2img(svg, function (error, buffer) {
+            fs.writeFileSync(path, buffer);
+        });
+        console.log('PNG saved at', path)
+        return path
+    }
+
 }
 
 module.exports = MasterController;

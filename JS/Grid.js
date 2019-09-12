@@ -142,7 +142,6 @@ class Grid {
     }
 }
 
-
 // ant methods
 var turnRight = (ant) => {
     ant.direction++;
@@ -182,7 +181,6 @@ var decStrokeWeight = (ant) => {
     if (ant.stroke_weight.index < 0)
         ant.stroke_weight.index = (ant.stroke_weight.values.length - 1)
 }
-
 
 var incRotation = (ant) => {
     ant.rotation.value = (ant.rotation.value + ant.rotation.delta) % 360

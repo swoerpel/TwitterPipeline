@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bandname": "^1.0.0",
     "chroma-js": "^2.0.4",
     "express": "^4.17.1",
     "fake-words": "^0.5.3",
@@ -19,6 +20,7 @@
     "paper": "^0.12.3",
     "paper-jsdom": "^0.12.3",
     "paper-jsdom-canvas": "^0.12.3",
+    "python-shell": "^1.0.8",
     "svg2img": "^0.6.1",
     "twit": "^2.2.11"
   }

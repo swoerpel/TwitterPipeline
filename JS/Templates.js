@@ -4,7 +4,12 @@ var consts = {
     LEFT: 2,
     DOWN: 3,
 }
-
+var step_shapes = [
+    'square',
+    'circle',
+    'triangle',
+    'cube'
+]
 var rule_templates = [
     { //square
         turnRight: true,
@@ -45,29 +50,46 @@ var rule_templates = [
         incSubShapes: true,
         decSubShapes: true,
     },
+    { //cube
+        turnRight: true,
+        turnLeft: true,
+        goStraight: true,
+        incStrokeWeight: true,
+        decStrokeWeight: true,
+        incRotation: false,
+        decRotation: false,
+        incStepSize: false,
+        decStepSize: false,
+        incSubShapes: false,
+        decSubShapes: false,
+    },
 ]
 
 var grid_sizes = [
-    { x: 2, y: 2 },
-    { x: 4, y: 4 },
-    { x: 8, y: 8 },
+    { x: 2 * 2, y: 2 },
+    { x: 4 * 2, y: 4 },
+    { x: 8 * 2, y: 8 },
     { x: 16, y: 16 },
     // { x: 32, y: 32 },
     // { x: 64, y: 64 },
 ]
 
-var step_shapes = [
-    'square',
-    'circle',
-    'triangle'
-]
+var png_dims = {
+    width: 2400 * 2,
+    height: 2400
+}
 
 var stroke_weight_templates = [
-    [2, 1.5, 1, .5], //square
-    // [2, 1, .9, .8, .7, .6, .5,], //square
-    [1, .9, .8, .7, .6, .5, .4, .3],//, 0.9, 0.8, 0.7, 0.6, 0.5], //circle
-    [2, 1, .75, .5], //triangle
+    // [2, 1.5, 1, .9, .8, .7, .6, .5], //square
+    [1], //square
+    [1],//, 0.9, 0.8, 0.7, 0.6, 0.5], //circle
+    // [1, .9, .8, .7, .6, .5, .4, .3],//, 0.9, 0.8, 0.7, 0.6, 0.5], //circle
+    [1], //triangle
+    // [1, .9, .8, .7, .6, .5,], //triangle
+    // [1, .95, .9, .85, .8, .75, .7, .65, .6, .55, .5, .45, .4, .35, .3], //triangle
+    [1], //cube
 ]
+
 
 
 
@@ -81,19 +103,20 @@ var color_attributes = {
     //2 - gradient streaks
     //3 - shuffled gradient
     //4 - mini-ant
-    style: 5
+    style: 0
 }
 
 var sub_shape_attributes = {
     index: 0,
-    values: [1, 2],
-    stroke_weights: [1, .5],
+    values: [1],
+    stroke_weights: [1,],
+    // stroke_weights: [1, .9, .8, .7, .6, .5,],
 }
 
 var rotation_attributes = {
     // index:
     value: 0,
-    delta: 90, //Math.PI / 2
+    delta: 180, //Math.PI / 2
 }
 
 // ARRAY
@@ -110,3 +133,4 @@ exports.step_shapes = step_shapes;
 exports.stroke_weight_templates = stroke_weight_templates;
 exports.ant_attributes = ant_attributes;
 exports.consts = consts
+exports.png_dims = png_dims

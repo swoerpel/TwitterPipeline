@@ -21,6 +21,7 @@
     "paper-jsdom": "^0.12.3",
     "paper-jsdom-canvas": "^0.12.3",
     "python-shell": "^1.0.8",
+    "steggy": "^2.0.1",
     "svg2img": "^0.6.1",
     "twit": "^2.2.11"
   }

@@ -10,29 +10,22 @@ var ColorSequencer = require('./ColorSequencer.js');
 
 class MasterController {
     constructor() {
-
+        this.grid_size_index = 0;
+        this.image_id = ''
     }
 
-    SetPaths(svg_path, png_path) {
-        this.paths = {
-            svg: svg_path,
-            png: png_path
-        }
-    }
 
-    SetStepShape(step_shape) {
-        this.step_shape = step_shape;
-    }
 
-    GenerateVitalParams(step_shape) {
+
+    GenerateVitalParams() {
         let vital_params = {
             step_shape: {
-                id: step_shape,
-                name: Templates.step_shapes[step_shape]
+                id: this.step_shape,
+                name: Templates.step_shapes[this.step_shape]
             },
-            rule_template: Templates.rule_templates[step_shape],
-            grid_size: Templates.grid_sizes[1],
-            stroke_weights: Templates.stroke_weight_templates[step_shape],
+            rule_template: Templates.rule_templates[this.step_shape],
+            grid_size: Templates.grid_sizes[this.grid_size_index],
+            stroke_weights: Templates.stroke_weight_templates[this.step_shape],
             ant_count: 20,
             ant_origins_random: true,
             duration: 5000,
@@ -46,8 +39,10 @@ class MasterController {
         this.color_machine = color_machine;
         console.log('generating new image...')
         this.vital_params = this.GenerateVitalParams(this.step_shape)
-        this.paper_width = 600 * this.vital_params.grid_size.x
-        this.paper_height = 600 * this.vital_params.grid_size.y
+        let tile_width = Templates.png_dims.width / this.vital_params.grid_size.x
+        let tile_height = Templates.png_dims.height / this.vital_params.grid_size.y
+        this.paper_width = tile_width * this.vital_params.grid_size.x
+        this.paper_height = tile_height * this.vital_params.grid_size.y
         paper.setup(new paper.Size(this.paper_width, this.paper_height))
         this.DrawBackground()
         // this.DrawBackground(color_machine(Math.random()).hex())
@@ -63,23 +58,52 @@ class MasterController {
             matchShapes: true,
             embedImages: false
         });
-        let image_id = makeid(6).toString()
+        let image_id;
+
+        // image_id = makeid(6).toString()
+        image_id = this.image_id //+ '_' + makeid(6).toString()
         // image_id += timestamp;
         console.log('IMAGE ID: ', image_id)
-        this.ExportSVG(svg, image_id);
+        // this.ExportSVG(svg, image_id);
         let png_path = this.ExportPNG(svg, image_id);
         return png_path
     }
 
+    SetPaths(svg_path, png_path) {
+        this.paths = {
+            svg: svg_path,
+            png: png_path
+        }
+    }
 
+    SetStepShape(step_shape) {
+        this.step_shape = step_shape;
+    }
 
+    SetStrokeWeights(weights) {
+        Templates.stroke_weight_templates[this.step_shape] = weights;
+        // Templates.ant_attributes.sub_shape.stroke_weights
+    }
     SetRotation(rotation) {
         Templates.ant_attributes.rotation.delta = rotation;
     }
-
-    SetStrokeWeight(sw) {
-        Templates.stroke_weight_templates[0] = sw;
+    SetSubShapes(values) {
+        Templates.ant_attributes.sub_shape.values = values
     }
+    SetSubStrokeWeights(weights) {
+        Templates.ant_attributes.sub_shape.stroke_weights = weights
+    }
+
+
+
+    SetGridSize(index) {
+        this.grid_size_index = index;
+    }
+
+    SetImageId(image_id) {
+        this.image_id = image_id
+    }
+
     DrawGrids(grid) {
         // console.log('vital params', this.vital_params)
         for (let i = 0; i < this.vital_params.grid_size.x; i++) {
@@ -104,6 +128,8 @@ class MasterController {
                     this.DrawCircles(grid_values, colors);
                 if (this.vital_params.step_shape.name == 'triangle')
                     this.DrawTriangles(grid_values, colors);
+                if (this.vital_params.step_shape.name == 'cube')
+                    this.DrawCubes(grid_values, colors);
             }
         }
     }
@@ -214,6 +240,61 @@ class MasterController {
             }
         }
     }
+    DrawCubes(grid_values, colors) {
+        for (let k = 0; k < grid_values.sub_shape; k++) {
+            for (let l = 0; l < grid_values.sub_shape; l++) {
+                let radius = grid_values.width / grid_values.sub_shape / 2
+                let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k + radius / 2
+                let y_local_origin = grid_values.origin.y + grid_values.width / grid_values.sub_shape * l + radius / 2
+                let local_origin = new paper.Point(x_local_origin, y_local_origin);
+                // let origin_circle = new paper.Path.Circle(local_origin, radius)
+                // origin_circle.fillColor = 'black'
+                let concentric_sub_stroke_weights;
+                if (grid_values.sub_shape == 1)
+                    concentric_sub_stroke_weights = grid_values.stroke_weight;
+                else
+                    concentric_sub_stroke_weights = Templates.ant_attributes.sub_shape.stroke_weights;
+
+                let group = createBlock(radius);
+
+                // var length = Math.min(count + values.amount, group.children.length);
+                // for (var i = count; i < length; i++) {
+                let piece = group.children[l];
+                var hexagon = piece.children[0];
+                let color = colors[Math.floor(Math.random() * colors.length)]
+                hexagon.fillColor = color;
+                var top = piece.children[1];
+                top.fillColor = color.clone();
+                top.fillColor.brightness *= 1.5;
+
+                var right = piece.children[2];
+                right.fillColor = color.clone();
+                right.fillColor.brightness *= 0.5;
+
+                // let base_triangle = new paper.Path();
+                // base_triangle.strokeWidth = 0
+                // base_triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y - local_radius));
+                // base_triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
+                // base_triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
+                // grid_values.rotation.sort(() => Math.random() - 0.5)
+                // grid_values.rotation.map((rot) => {
+                //     concentric_sub_stroke_weights.map((sw) => {
+                //         local_radius = radius * sw
+                //         let triangle = new paper.Path();
+                //         triangle.strokeWidth = 0
+                //         triangle.fillColor = this.color_machine(Math.random()).hex();
+                //         triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y - local_radius));
+                //         triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
+                //         triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
+                //         let color_val = colors[Math.floor(Math.random() * colors.length)]
+                //         triangle.fillColor = this.color_machine(color_val).hex();
+                //         triangle.rotate(rot, local_origin)
+
+                //     });
+                // });
+            }
+        }
+    }
 
     DrawBackground(color = 'black') {
         var rect = new paper.Path.Rectangle({
@@ -249,8 +330,68 @@ class MasterController {
     }
 
 }
-
 module.exports = MasterController;
+
+function createBlock(radius) {
+    var group = new paper.Group();
+    var hexagon = new paper.Path.RegularPolygon({
+        center: paper.view.center,
+        sides: 6,
+        radius: radius,
+        fillColor: 'gray',
+        parent: group
+    });
+    for (var i = 0; i < 2; i++) {
+        var path = new paper.Path({
+            closed: true,
+            parent: group,
+            fillColor: i == 0 ? 'white' : 'black'
+        });
+        for (var j = 0; j < 3; j++) {
+            var index = (i * 2 + j) % hexagon.segments.length;
+            path.add(hexagon.segments[index].clone());
+        }
+        path.add(hexagon.bounds.center);
+    }
+    // Remove the group from the document, so it is not drawn:
+    group.remove();
+    return group;
+}
+
+
+// var Cube = function (position, size, colour, rotate_speed, stroke_width) {
+//     this.stroke_width = stroke_width;
+//     this.rotate_speed = rotate_speed;
+//     this.init(position, size, colour);
+//     this.connectCubes(this.rect, this.rect2);
+// }
+
+// Cube.prototype.init = function (position, size, colour) {
+//     this.colour = colour;
+//     this.connects = new Array();
+//     this.rect = new paper.Path.Rectangle(position, size);
+//     this.rect.strokeColor = colour;
+//     this.rect.strokeWidth = this.stroke_width;
+//     this.rect2 = new paper.Path.Rectangle(new paper.Point(position.x + (Math.random() / 2 * size), position.y - (Math.random() / 2 * size)), size);
+//     this.rect2.strokeColor = colour;
+//     this.rect2.strokeWidth = this.stroke_width;
+// };
+
+// Cube.prototype.connectCubes = function (rect1, rect2) {
+//     for (var i = rect1.segments.length - 1; i >= 0; i--) {
+//         var connect = new paper.Path.Line(rect1.segments[i].point, rect2.segments[i].point);
+//         connect.strokeColor = this.colour;
+//         connect.strokeWidth = this.stroke_width;
+//         this.connects.push(connect);
+//     };
+// }
+
+// Cube.prototype.clearConnects = function () {
+//     for (var i = this.connects.length - 1; i >= 0; i--) {
+//         this.connects[i].remove();
+//     };
+// };
+
 
 
 function makeid(length) {
@@ -261,6 +402,7 @@ function makeid(length) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     // return result;
+
     return fake.word();
 }
 

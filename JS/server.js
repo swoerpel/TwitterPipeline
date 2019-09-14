@@ -50,11 +50,66 @@ let tweet_image_name;
 let possible_rotations = [30, 45, 60, 90, 180];
 let rotation = possible_rotations[Math.floor(Math.random() * possible_rotations.length)];
 // let sw = [4, 3, 2, 1];
-let debugging = true;
+let mode = 'debug';
 
 
 
-if (debugging) {
+if (mode == 'debug') {
+
+    var generate_image = async (step_shape, image_id, grid_size) => {
+
+        let color_machine = chroma.scale(palette)
+        // let image_id = fake.word();
+        let master_controller = new MasterController();
+        master_controller.SetPaths(svg_path, png_path);
+        master_controller.SetStepShape(step_shape);
+        master_controller.SetGridSize(grid_size);
+        master_controller.SetImageId(image_id);
+        master_controller.SetStrokeWeights([1, .9, .8, .7, .6, .5]);
+        master_controller.SetRotation(90);
+        master_controller.SetSubShapes([1, 2]);
+        master_controller.SetSubStrokeWeights([1, .5]);
+        master_controller.GenerateImage(color_machine);
+    }
+    let palette = palettes[Math.floor(Math.random() * palettes.length)];
+    let fake_word = fake.word();
+    let id1 = fake_word + '0'
+    let id2 = fake_word + '1'
+    let id3 = fake_word + '2'
+    generate_image(2, id1, 0, palette);
+    generate_image(2, id2, 1, palette);
+    generate_image(2, id3, 2, palette);
+
+    generate_mask(1);
+
+    // // python script testing
+    let image_paths = [
+        png_path + id1,
+        png_path + id2,
+        png_path + id3,
+    ]
+    function runScript() {
+        return spawn('python', [
+            "-u",
+            python_scripts.LayerImages,
+            image_paths, combined_png_path,
+        ]);
+    }
+    const subprocess = runScript()
+
+    subprocess.stdout.on('data', (data) => {
+        console.log(`data:${data}`);
+    });
+    subprocess.stderr.on('data', (data) => {
+        console.log(`error:${data}`);
+    });
+    subprocess.stderr.on('close', () => {
+        console.log("Closed");
+    });
+
+
+}
+else if (mode == 'batch') {
     let PC = new ParameterController();
     let all_param_combos = PC.GenerateParams();
     // let image_count = 0;
@@ -75,19 +130,15 @@ if (debugging) {
         let name = fake.word();
         for (let j = 0; j < 3; j++) {
             // let rand = Math.floor(Math.random() * all_param_combos.length)
-
             let keys = all_param_combos[index].keys
             let values = all_param_combos[index].values
             console.log('values', values)
-
             let image_id = keys.join('_')
             image_id = counter.toString() + '-' +
                 j.toString() + '_' +
                 image_id + '_' +
                 palette + '_' +
                 name
-
-
             console.log(image_id)
             let master_controller = new MasterController();
             master_controller.SetPaths(chet_svg_path, chet_png_path);
@@ -99,85 +150,11 @@ if (debugging) {
             master_controller.SetSubShapes(values[2]);
             master_controller.SetSubStrokeWeights(values[3]);
             master_controller.GenerateImage(color_machine);
-            // break;
-            // await delay(2000)
         }
     }
 
-    // let PC = new ParameterController();
-    // let all_param_combos = PC.GenerateParams();
-    // let counter = 0;
-    // for (let i = 0; i < all_param_combos.length; i++) {
-    //     let palette = palettes[Math.floor(Math.random() * palettes.length)];
-
-    //     console.log('parameter index', i)
-    //     for (let j = 0; j < 3; j++) {
-
-    //         // let rand = Math.floor(Math.random() * all_param_combos.length)
-    //         let keys = all_param_combos[i].keys
-    //         let values = all_param_combos[i].values
-    //         console.log('values', values)
-    //         let color_machine = chroma.scale(palette)
-    //         let image_id = keys.join('_')
-    //         image_id = counter.toString() + '-' +
-    //             j.toString() + '_' +
-    //             image_id + '_' +
-    //             palette
-    //         console.log(image_id)
-
-
-    //         let master_controller = new MasterController();
-    //         master_controller.SetPaths(chet_svg_path, chet_png_path);
-    //         master_controller.SetStepShape(j);
-    //         master_controller.SetGridSize(1);
-    //         master_controller.SetImageId(image_id);
-    //         master_controller.SetStrokeWeights(values[0]);
-    //         master_controller.SetRotation(values[1]);
-    //         master_controller.SetSubShapes(values[2]);
-    //         master_controller.SetSubStrokeWeights(values[3]);
-    //         master_controller.GenerateImage(color_machine);
-    //         // break;
-
-    //     }
-    //     break;
-    // }
-
-
-    // rotation = 90;
-    // master_controller.SetPaths(dbg_path, dbg_path)
-    // // let palette = 'RdBu'
-    // let palette = palettes[Math.floor(Math.random() * palettes.length)];
-    // let color_machine = chroma.scale(palette)
-    // master_controller.SetStepShape(2)
-    // master_controller.SetGridSize(0);
-    // master_controller.SetRotation(rotation);
-    // // master_controller.SetStrokeWeight(sw);
-    // master_controller.GenerateImage(color_machine);
-
-    // // python script testing
-
-    // function runScript() {
-    //     return spawn('python', [
-    //         "-u",
-    //         python_scripts.LayerImages,
-    //         png_path, combined_png_path,
-    //     ]);
-    // }
-    // const subprocess = runScript()
-
-    // subprocess.stdout.on('data', (data) => {
-    //     console.log(`data:${data}`);
-    // });
-    // subprocess.stderr.on('data', (data) => {
-    //     console.log(`error:${data}`);
-    // });
-    // subprocess.stderr.on('close', () => {
-    //     console.log("Closed");
-    // });
-
-
 }
-else {
+else if (mode == 'twitter') {
     let master_controller = new MasterController();
 
     let J1 = schedule.scheduleJob(T1, () => {

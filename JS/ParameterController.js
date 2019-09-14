@@ -4,7 +4,7 @@ class ParameterController {
 
     GenerateParams() {
         let params = {
-            sw: generate_decimal_ranges(0.5, 2, 1, 5),// + [1],
+            sw: generate_decimal_ranges(0.5, 4, 1, 8),// + [1],
             rot: [0, 90, 180],
             // rot: generate_integer_range(45, 90, 45),
             // sub_shapes: generate_integer_range(1, 4, 1),

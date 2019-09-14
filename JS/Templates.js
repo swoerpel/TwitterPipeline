@@ -66,16 +66,16 @@ var rule_templates = [
 ]
 
 var grid_sizes = [
-    { x: 2 * 2, y: 2 },
-    { x: 4 * 2, y: 4 },
-    { x: 8 * 2, y: 8 },
+    { x: 2, y: 2 },
+    { x: 4, y: 4 },
+    { x: 8, y: 8 },
     { x: 16, y: 16 },
     // { x: 32, y: 32 },
     // { x: 64, y: 64 },
 ]
 
 var png_dims = {
-    width: 2400 * 2,
+    width: 2400,
     height: 2400
 }
 

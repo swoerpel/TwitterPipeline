@@ -64,7 +64,7 @@ class MasterController {
         image_id = this.image_id //+ '_' + makeid(6).toString()
         // image_id += timestamp;
         console.log('IMAGE ID: ', image_id)
-        // this.ExportSVG(svg, image_id);
+        this.ExportSVG(svg, image_id);
         let png_path = this.ExportPNG(svg, image_id);
         return png_path
     }

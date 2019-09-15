@@ -70,7 +70,7 @@ const generate_all_combos = (params, max_indexes) => {
                     }
 
                     all_combos.push(combo)
-                    // console.log(combo)
+                    console.log(combo)
                     counter++;
                 }
             }

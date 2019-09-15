@@ -1,11 +1,11 @@
 var fs = require('fs'),
     path = require('path'),
     fake = require('fake-words'),
-
     Twit = require('twit'),
     chroma = require('chroma-js'),
     MasterController = require('./MasterController.js'),
     ParameterController = require('./ParameterController.js'),
+    mask = require('./MaskGenerator.js'),
     schedule = require('node-schedule'),
     config = require('./config.js');
 const { spawn } = require('child_process')
@@ -15,7 +15,7 @@ var T2 = new schedule.RecurrenceRule();
 var T3 = new schedule.RecurrenceRule();
 var T4 = new schedule.RecurrenceRule();
 var T5 = new schedule.RecurrenceRule();
-let min = 50
+let min = 34
 T1.minute = min;
 T2.minute = min;
 T3.minute = min;
@@ -52,60 +52,75 @@ let rotation = possible_rotations[Math.floor(Math.random() * possible_rotations.
 // let sw = [4, 3, 2, 1];
 let mode = 'debug';
 
+var generate_image = async (step_shape, image_id, grid_size) => {
 
+    let color_machine = chroma.scale(palette)
+    // let image_id = fake.word();
+    let master_controller = new MasterController();
+    master_controller.SetPaths(svg_path, png_path);
+    master_controller.SetStepShape(step_shape);
+    master_controller.SetGridSize(grid_size);
+    master_controller.SetImageId(image_id);
+    master_controller.SetStrokeWeights([1, .9, .8, .7, .6, .5]);
+    master_controller.SetRotation(90);
+    master_controller.SetSubShapes([1, 2]);
+    master_controller.SetSubStrokeWeights([1, .5]);
+    master_controller.GenerateImage(color_machine);
+}
 
 if (mode == 'debug') {
 
-    var generate_image = async (step_shape, image_id, grid_size) => {
+    // var generate_image = async (step_shape, image_id, grid_size) => {
 
-        let color_machine = chroma.scale(palette)
-        // let image_id = fake.word();
-        let master_controller = new MasterController();
-        master_controller.SetPaths(svg_path, png_path);
-        master_controller.SetStepShape(step_shape);
-        master_controller.SetGridSize(grid_size);
-        master_controller.SetImageId(image_id);
-        master_controller.SetStrokeWeights([1, .9, .8, .7, .6, .5]);
-        master_controller.SetRotation(90);
-        master_controller.SetSubShapes([1, 2]);
-        master_controller.SetSubStrokeWeights([1, .5]);
-        master_controller.GenerateImage(color_machine);
-    }
-    let palette = palettes[Math.floor(Math.random() * palettes.length)];
-    let fake_word = fake.word();
-    let id1 = fake_word + '0'
-    let id2 = fake_word + '1'
-    let id3 = fake_word + '2'
-    generate_image(2, id1, 0, palette);
-    generate_image(2, id2, 1, palette);
-    generate_image(2, id3, 2, palette);
-
-    generate_mask(1);
-
+    //     let color_machine = chroma.scale(palette)
+    //     // let image_id = fake.word();
+    //     let master_controller = new MasterController();
+    //     master_controller.SetPaths(svg_path, png_path);
+    //     master_controller.SetStepShape(step_shape);
+    //     master_controller.SetGridSize(grid_size);
+    //     master_controller.SetImageId(image_id);
+    //     master_controller.SetStrokeWeights([1, .9, .8, .7, .6, .5]);
+    //     master_controller.SetRotation(90);
+    //     master_controller.SetSubShapes([1, 2]);
+    //     master_controller.SetSubStrokeWeights([1, .5]);
+    //     master_controller.GenerateImage(color_machine);
+    // }
+    // let palette = palettes[Math.floor(Math.random() * palettes.length)];
+    // let fake_word = fake.word();
+    // let id1 = fake_word + '0'
+    // let id2 = fake_word + '1'
+    // let id3 = fake_word + '2'
+    // generate_image(2, id1, 0, palette);
+    // generate_image(2, id2, 1, palette);
+    // generate_image(2, id3, 2, palette);
+    let MG = new mask.MaskGenerator(png_path)
+    // let mask1_path = 'm1' + id1
+    // MG.GenerateMask({ width: 400, height: 400 }, 0, mask1_path)
+    MG.GenerateParade();
     // // python script testing
-    let image_paths = [
-        png_path + id1,
-        png_path + id2,
-        png_path + id3,
-    ]
-    function runScript() {
-        return spawn('python', [
-            "-u",
-            python_scripts.LayerImages,
-            image_paths, combined_png_path,
-        ]);
-    }
-    const subprocess = runScript()
+    // let image_paths = [
+    //     png_path + id1,
+    //     png_path + id2,
+    //     png_path + id3,
+    // ]
+    // function runScript() {
+    //     return spawn('python', [
+    //         "-u",
+    //         python_scripts.LayerImages,
+    //         image_paths, combined_png_path,
+    //     ]);
+    // }
+    // const subprocess = runScript()
 
-    subprocess.stdout.on('data', (data) => {
-        console.log(`data:${data}`);
-    });
-    subprocess.stderr.on('data', (data) => {
-        console.log(`error:${data}`);
-    });
-    subprocess.stderr.on('close', () => {
-        console.log("Closed");
-    });
+    // subprocess.stdout.on('data', (data) => {
+    //     console.log(`data:${data}`);
+    // });
+    // subprocess.stderr.on('data', (data) => {
+    //     console.log(`error:${data}`);
+    // });
+    // subprocess.stderr.on('close', () => {
+    //     console.log("Closed");
+    // });
 
 
 }
@@ -140,16 +155,17 @@ else if (mode == 'batch') {
                 palette + '_' +
                 name
             console.log(image_id)
-            let master_controller = new MasterController();
-            master_controller.SetPaths(chet_svg_path, chet_png_path);
-            master_controller.SetStepShape(j);
-            master_controller.SetGridSize(1);
-            master_controller.SetImageId(image_id);
-            master_controller.SetStrokeWeights(values[0]);
-            master_controller.SetRotation(values[1]);
-            master_controller.SetSubShapes(values[2]);
-            master_controller.SetSubStrokeWeights(values[3]);
-            master_controller.GenerateImage(color_machine);
+            generate_image(2, image_id, 1, palette);
+            // let master_controller = new MasterController();
+            // master_controller.SetPaths(chet_svg_path, chet_png_path);
+            // master_controller.SetStepShape(j);
+            // master_controller.SetGridSize(1);
+            // master_controller.SetImageId(image_id);
+            // master_controller.SetStrokeWeights(values[0]);
+            // master_controller.SetRotation(values[1]);
+            // master_controller.SetSubShapes(values[2]);
+            // master_controller.SetSubStrokeWeights(values[3]);
+            // master_controller.GenerateImage(color_machine);
         }
     }
 

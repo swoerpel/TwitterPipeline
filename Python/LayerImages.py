@@ -7,10 +7,9 @@ from os.path import isfile, join
 def main(argv):
     image_sources = argv[0]
     image_dest = argv[1]
-    argument = ''
-    usage = 'usage: script.py -f <sometext>'
     print('image source and dest', image_source, image_dest)
-    images = [f for f in listdir(image_source)if isfile(join(image_source, f))]
+    images = [f for f in listdir(image_source)
+              if isfile(join(image_source, f))]
     print('files in source', images)
     # im1 = Image.open(image_source + images[0])
     # im2 = Image.open(image_source + images[1])

@@ -20,6 +20,7 @@ class Grid {
                 sub_shape: 1,
                 stroke_weight: [],
                 rotation: [],
+                order: 0,
             }));
     }
 

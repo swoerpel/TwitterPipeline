@@ -132,7 +132,7 @@ else if (mode == 'single') {
             png: dbg_path,
         },
         step_shape: 2,
-        grid_size: 3,
+        grid_size: 0,
         palette: palettes[Math.floor(Math.random() * palettes.length)],
         image_id: fake.word(),
         stroke_weights: [1, .9, .8, .7, .6, .5],

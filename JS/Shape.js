@@ -1,10 +1,12 @@
-var paper = require('paper-jsdom-canvas');
+var paper;// = require('paper-jsdom-canvas');
 var Templates = require('./Templates.js');
 
 module.exports = {
 
+    SetPaper: (p) => { paper = p; console.log('set paper', Object.keys(p)); },
 
     DrawBackground: (color = 'black') => {
+        // console.log('draw background', paper)
         var rect = new paper.Path.Rectangle({
             point: [0, 0],
             size: [paper.view.size.width, paper.view.size.height],
@@ -15,7 +17,8 @@ module.exports = {
         rect.fillColor = color;
     },
 
-    DrawSquares: (grid_values, colors, color_machine) => {
+    DrawSquares: (grid_values, colors, color_machine, paper) => {
+        console.log('in draw squares')
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k
@@ -65,6 +68,8 @@ module.exports = {
 
 
     DrawTriangles: (grid_values, colors, color_machine) => {
+        console.log('in draw triangles')
+
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let radius = grid_values.width / grid_values.sub_shape / 2

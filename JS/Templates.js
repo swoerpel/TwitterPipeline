@@ -75,7 +75,7 @@ var grid_sizes = [
 ]
 
 var png_dims = {
-    width: 2400 * 2,
+    width: 2400,
     height: 2400
 }
 

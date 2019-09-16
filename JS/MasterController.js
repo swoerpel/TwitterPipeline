@@ -38,6 +38,7 @@ class MasterController {
     }
 
     SetupPaper() {
+        // console.log(Templates.png_dims)
         let tile_width = Templates.png_dims.width / this.vital_params.grid_size.x
         let tile_height = Templates.png_dims.height / this.vital_params.grid_size.y
         this.paper_width = tile_width * this.vital_params.grid_size.x
@@ -91,8 +92,15 @@ class MasterController {
     SetSubStrokeWeights(weights) {
         Templates.ant_attributes.sub_shape.stroke_weights = weights
     }
-
-
+    SetGridScale(scale) {
+        Templates.scale_sizes.x = scale.y
+        Templates.scale_sizes.y = scale.y
+        this.SetPngSize()
+    }
+    SetPngSize() {
+        Templates.png_dims.width *= Templates.scale_sizes.x
+        Templates.png_dims.height *= Templates.scale_sizes.y
+    }
 
     SetGridSize(index) {
         this.grid_size_index = index;
@@ -118,7 +126,7 @@ class MasterController {
                 let linear_index = spiral[i][j]//linear_grid[linear_spiral[index]];
                 let current_grid = linear_grid[linear_index];
                 // let current_grid = linear_grid[linear_spiral[index]];
-                console.log(linear_index)
+                // console.log(linear_index)
                 let grid_values = {
                     origin: origin,
                     width: this.paper_width / this.vital_params.grid_size.x,

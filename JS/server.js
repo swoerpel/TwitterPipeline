@@ -57,6 +57,7 @@ var generate_image = async (params) => {
     let master_controller = new MasterController();
     master_controller.SetPaths(params.paths.svg, params.paths.png);
     master_controller.SetStepShape(params.step_shape);
+    master_controller.SetGridScale(params.grid_scale);
     master_controller.SetGridSize(params.grid_size);
     master_controller.SetImageId(params.image_id);
     master_controller.SetStrokeWeights(params.stroke_weights);
@@ -133,14 +134,15 @@ else if (mode == 'single') {
             svg: dbg_path_svg,
             png: dbg_path_png,
         },
-        step_shape: 2,
-        grid_size: 1,
+        step_shape: 1,
+        grid_scale: { x: 1, y: 1 },
+        grid_size: 2,
         palette: palettes[Math.floor(Math.random() * palettes.length)],
         image_id: 'chez',//fake.word(),
         // stroke_weights: [2, 1.0],
-        stroke_weights: [2, 1, .5],
+        stroke_weights: [4, 2, 1, .5],
         rotation: 90,
-        sub_shapes: [1, 2],
+        sub_shapes: [1, 2, 4],
         sub_stroke_weights: [1, .5],
     }
 

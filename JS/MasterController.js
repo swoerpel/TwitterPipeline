@@ -49,36 +49,21 @@ class MasterController {
         this.color_machine = color_machine;
         console.log('generating new image...')
         this.vital_params = this.GenerateVitalParams(this.step_shape)
-        // let tile_width = Templates.png_dims.width / this.vital_params.grid_size.x
-        // let tile_height = Templates.png_dims.height / this.vital_params.grid_size.y
-        // this.paper_width = tile_width * this.vital_params.grid_size.x
-        // this.paper_height = tile_height * this.vital_params.grid_size.y
-        // paper.setup(new paper.Size(this.paper_width, this.paper_height))
         this.SetupPaper();
-        console.log('pre set paper')
         DrawBackground();
-        // this.DrawBackground(color_machine(Math.random()).hex())
-        // console.log('vital params', this.vital_params)
         let grid = new Grid(this.vital_params)
         let grid_layers = grid.WalkAnts(this.vital_params.duration)
-        // console.log('grid layers', grid_layers)
         this.DrawGrids(grid_layers)
         console.log('generating SVG');
-        // this.Shape
         let svg = paper.project.exportSVG({
             asString: true,
             precision: 2,
             matchShapes: true,
             embedImages: false
         });
-        let image_id;
-
-        // image_id = makeid(6).toString()
-        image_id = this.image_id //+ '_' + makeid(6).toString()
-        // image_id += timestamp;
-        console.log('IMAGE ID: ', image_id)
-        this.ExportSVG(svg, image_id);
-        let png_path = this.ExportPNG(svg, image_id);
+        console.log('IMAGE ID: ', this.image_id)
+        this.ExportSVG(svg, this.image_id);
+        let png_path = this.ExportPNG(svg, this.image_id);
         return png_path
     }
 

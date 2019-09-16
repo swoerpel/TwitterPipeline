@@ -1,11 +1,13 @@
 var fs = require('fs');
 var path = require('path');
 var paper = require('paper-jsdom-canvas');
+
 var fake = require('fake-words');
 var svg2img = require('svg2img');
 var Templates = require('./Templates.js');
 var Grid = require('./Grid.js');
 var ColorSequencer = require('./ColorSequencer.js');
+var Shape = require('./Shape.js')
 
 
 class MasterController {
@@ -44,7 +46,7 @@ class MasterController {
         this.paper_width = tile_width * this.vital_params.grid_size.x
         this.paper_height = tile_height * this.vital_params.grid_size.y
         paper.setup(new paper.Size(this.paper_width, this.paper_height))
-        this.DrawBackground()
+        Shape.DrawBackground()
         // this.DrawBackground(color_machine(Math.random()).hex())
         // console.log('vital params', this.vital_params)
         let grid = new Grid(this.vital_params)
@@ -123,13 +125,13 @@ class MasterController {
                 let colors = this.SetColors(Templates.ant_attributes.color.style, grid_values.color)
 
                 if (this.vital_params.step_shape.name == 'square')
-                    this.DrawSquares(grid_values, colors);
+                    Shape.DrawSquares(grid_values, colors, this.color_machine);
                 if (this.vital_params.step_shape.name == 'circle')
-                    this.DrawCircles(grid_values, colors);
+                    Shape.DrawCircles(grid_values, colors, this.color_machine);
                 if (this.vital_params.step_shape.name == 'triangle')
-                    this.DrawTriangles(grid_values, colors);
+                    Shape.DrawTriangles(grid_values, colors, this.color_machine);
                 if (this.vital_params.step_shape.name == 'cube')
-                    this.DrawCubes(grid_values, colors);
+                    Shape.DrawCustomShape(grid_values, colors, this.color_machine);
             }
         }
     }
@@ -153,159 +155,7 @@ class MasterController {
         return colors
     }
 
-    DrawSquares(grid_values, colors) {
-        for (let k = 0; k < grid_values.sub_shape; k++) {
-            for (let l = 0; l < grid_values.sub_shape; l++) {
-                let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k
-                let y_local_origin = grid_values.origin.y + grid_values.width / grid_values.sub_shape * l
-                let local_origin = new paper.Point(x_local_origin, y_local_origin);
-                let size = new paper.Size(grid_values.width / grid_values.sub_shape, grid_values.width / grid_values.sub_shape);
-                let concentric_sub_stroke_weights;
-                if (grid_values.sub_shape == 1)
-                    concentric_sub_stroke_weights = grid_values.stroke_weight;
-                else
-                    concentric_sub_stroke_weights = Templates.ant_attributes.sub_shape.stroke_weights;
 
-                concentric_sub_stroke_weights.map((sw, index) => {
-                    let con_size = new paper.Size(size.width, size.height);
-                    let concentric_square = new paper.Path.Rectangle(local_origin, con_size);
-                    let color_val = colors[Math.floor(Math.random() * colors.length)]
-                    concentric_square.fillColor = this.color_machine(color_val).hex();
-                    concentric_square.scale(sw, concentric_square.bounds.center);
-                });
-            }
-        }
-    }
-
-    DrawCircles(grid_values, colors) {
-        for (let k = 0; k < grid_values.sub_shape; k++) {
-            for (let l = 0; l < grid_values.sub_shape; l++) {
-                let radius = grid_values.width / grid_values.sub_shape / 2
-                let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k + radius
-                let y_local_origin = grid_values.origin.y + grid_values.width / grid_values.sub_shape * l + radius
-                let local_origin = new paper.Point(x_local_origin, y_local_origin);
-                // let circle = new paper.Path.Circle(local_origin, radius);
-                // circle.fillColor = this.color_machine(Math.random()).hex();
-                let concentric_sub_stroke_weights;
-                if (grid_values.sub_shape == 1)
-                    concentric_sub_stroke_weights = grid_values.stroke_weight;
-                else
-                    concentric_sub_stroke_weights = Templates.ant_attributes.sub_shape.stroke_weights;
-                concentric_sub_stroke_weights.map((sw) => {
-                    let concentric_circle = new paper.Path.Circle(local_origin, radius);
-                    let color_val = colors[Math.floor(Math.random() * colors.length)]
-                    concentric_circle.fillColor = this.color_machine(color_val).hex();
-                    concentric_circle.scale(sw, concentric_circle.bounds.center);
-                });
-            }
-        }
-    }
-
-    DrawTriangles(grid_values, colors) {
-        for (let k = 0; k < grid_values.sub_shape; k++) {
-            for (let l = 0; l < grid_values.sub_shape; l++) {
-                let radius = grid_values.width / grid_values.sub_shape / 2
-                let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k + radius
-                let y_local_origin = grid_values.origin.y + grid_values.width / grid_values.sub_shape * l + radius
-                let local_origin = new paper.Point(x_local_origin, y_local_origin);
-                // let origin_circle = new paper.Path.Circle(local_origin, radius)
-                // origin_circle.fillColor = 'black'
-                let concentric_sub_stroke_weights;
-                if (grid_values.sub_shape == 1)
-                    concentric_sub_stroke_weights = grid_values.stroke_weight;
-                else
-                    concentric_sub_stroke_weights = Templates.ant_attributes.sub_shape.stroke_weights;
-                let local_radius = radius
-                // let base_triangle = new paper.Path();
-                // base_triangle.strokeWidth = 0
-                // base_triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y - local_radius));
-                // base_triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
-                // base_triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
-                grid_values.rotation.sort(() => Math.random() - 0.5)
-                grid_values.rotation.map((rot) => {
-                    concentric_sub_stroke_weights.map((sw) => {
-                        local_radius = radius * sw
-                        let triangle = new paper.Path();
-                        triangle.strokeWidth = 0
-                        triangle.fillColor = this.color_machine(Math.random()).hex();
-                        triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y - local_radius));
-                        triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
-                        triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
-                        let color_val = colors[Math.floor(Math.random() * colors.length)]
-                        triangle.fillColor = this.color_machine(color_val).hex();
-                        triangle.rotate(rot, local_origin)
-
-                    });
-                });
-            }
-        }
-    }
-    DrawCubes(grid_values, colors) {
-        for (let k = 0; k < grid_values.sub_shape; k++) {
-            for (let l = 0; l < grid_values.sub_shape; l++) {
-                let radius = grid_values.width / grid_values.sub_shape / 2
-                let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k + radius / 2
-                let y_local_origin = grid_values.origin.y + grid_values.width / grid_values.sub_shape * l + radius / 2
-                let local_origin = new paper.Point(x_local_origin, y_local_origin);
-                // let origin_circle = new paper.Path.Circle(local_origin, radius)
-                // origin_circle.fillColor = 'black'
-                let concentric_sub_stroke_weights;
-                if (grid_values.sub_shape == 1)
-                    concentric_sub_stroke_weights = grid_values.stroke_weight;
-                else
-                    concentric_sub_stroke_weights = Templates.ant_attributes.sub_shape.stroke_weights;
-
-                let group = createBlock(radius);
-
-                // var length = Math.min(count + values.amount, group.children.length);
-                // for (var i = count; i < length; i++) {
-                let piece = group.children[l];
-                var hexagon = piece.children[0];
-                let color = colors[Math.floor(Math.random() * colors.length)]
-                hexagon.fillColor = color;
-                var top = piece.children[1];
-                top.fillColor = color.clone();
-                top.fillColor.brightness *= 1.5;
-
-                var right = piece.children[2];
-                right.fillColor = color.clone();
-                right.fillColor.brightness *= 0.5;
-
-                // let base_triangle = new paper.Path();
-                // base_triangle.strokeWidth = 0
-                // base_triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y - local_radius));
-                // base_triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
-                // base_triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
-                // grid_values.rotation.sort(() => Math.random() - 0.5)
-                // grid_values.rotation.map((rot) => {
-                //     concentric_sub_stroke_weights.map((sw) => {
-                //         local_radius = radius * sw
-                //         let triangle = new paper.Path();
-                //         triangle.strokeWidth = 0
-                //         triangle.fillColor = this.color_machine(Math.random()).hex();
-                //         triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y - local_radius));
-                //         triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
-                //         triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
-                //         let color_val = colors[Math.floor(Math.random() * colors.length)]
-                //         triangle.fillColor = this.color_machine(color_val).hex();
-                //         triangle.rotate(rot, local_origin)
-
-                //     });
-                // });
-            }
-        }
-    }
-
-    DrawBackground(color = 'black') {
-        var rect = new paper.Path.Rectangle({
-            point: [0, 0],
-            size: [paper.view.size.width, paper.view.size.height],
-            strokeColor: 'black',
-            selected: true
-        });
-        rect.sendToBack();
-        rect.fillColor = color;
-    }
 
     ExportSVG(svg, image_id) {
         // let path = path.resolve("chez") // COMMENT OUT 
@@ -331,68 +181,6 @@ class MasterController {
 
 }
 module.exports = MasterController;
-
-function createBlock(radius) {
-    var group = new paper.Group();
-    var hexagon = new paper.Path.RegularPolygon({
-        center: paper.view.center,
-        sides: 6,
-        radius: radius,
-        fillColor: 'gray',
-        parent: group
-    });
-    for (var i = 0; i < 2; i++) {
-        var path = new paper.Path({
-            closed: true,
-            parent: group,
-            fillColor: i == 0 ? 'white' : 'black'
-        });
-        for (var j = 0; j < 3; j++) {
-            var index = (i * 2 + j) % hexagon.segments.length;
-            path.add(hexagon.segments[index].clone());
-        }
-        path.add(hexagon.bounds.center);
-    }
-    // Remove the group from the document, so it is not drawn:
-    group.remove();
-    return group;
-}
-
-
-// var Cube = function (position, size, colour, rotate_speed, stroke_width) {
-//     this.stroke_width = stroke_width;
-//     this.rotate_speed = rotate_speed;
-//     this.init(position, size, colour);
-//     this.connectCubes(this.rect, this.rect2);
-// }
-
-// Cube.prototype.init = function (position, size, colour) {
-//     this.colour = colour;
-//     this.connects = new Array();
-//     this.rect = new paper.Path.Rectangle(position, size);
-//     this.rect.strokeColor = colour;
-//     this.rect.strokeWidth = this.stroke_width;
-//     this.rect2 = new paper.Path.Rectangle(new paper.Point(position.x + (Math.random() / 2 * size), position.y - (Math.random() / 2 * size)), size);
-//     this.rect2.strokeColor = colour;
-//     this.rect2.strokeWidth = this.stroke_width;
-// };
-
-// Cube.prototype.connectCubes = function (rect1, rect2) {
-//     for (var i = rect1.segments.length - 1; i >= 0; i--) {
-//         var connect = new paper.Path.Line(rect1.segments[i].point, rect2.segments[i].point);
-//         connect.strokeColor = this.colour;
-//         connect.strokeWidth = this.stroke_width;
-//         this.connects.push(connect);
-//     };
-// }
-
-// Cube.prototype.clearConnects = function () {
-//     for (var i = this.connects.length - 1; i >= 0; i--) {
-//         this.connects[i].remove();
-//     };
-// };
-
-
 
 function makeid(length) {
     var result = '';

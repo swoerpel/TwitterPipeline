@@ -68,26 +68,22 @@ var rule_templates = [
 var grid_sizes = [
     { x: 2, y: 2 },
     { x: 4, y: 4 },
-    { x: 8, y: 8 },
+    { x: 8 * 2, y: 8 },
     { x: 16, y: 16 },
     // { x: 32, y: 32 },
     // { x: 64, y: 64 },
 ]
 
 var png_dims = {
-    width: 2400,
+    width: 2400 * 2,
     height: 2400
 }
 
 var stroke_weight_templates = [
-    // [2, 1.5, 1, .9, .8, .7, .6, .5], //square
     [1], //square
     [1],//, 0.9, 0.8, 0.7, 0.6, 0.5], //circle
-    // [1, .9, .8, .7, .6, .5, .4, .3],//, 0.9, 0.8, 0.7, 0.6, 0.5], //circle
     [1], //triangle
-    // [1, .9, .8, .7, .6, .5,], //triangle
-    // [1, .95, .9, .85, .8, .75, .7, .65, .6, .55, .5, .45, .4, .35, .3], //triangle
-    [1], //cube
+    [1], //custom
 ]
 
 

@@ -31,7 +31,8 @@ let svg_path = "C:\\Files\\Art\\Tweets\\SVG\\"
 let png_path = "C:\\Files\\Art\\Tweets\\PNG\\"
 let combined_png_path = "C:\\Files\\Art\\Tweets\\CPNG\\"
 let png_posted_path = "C:\\Files\\Art\\Tweets\\Posted\\"
-let dbg_path = "C:\\Files\\Art\\Tweets\\Debug\\"
+let dbg_path_png = "C:\\Files\\Art\\Tweets\\Debug\\"
+let dbg_path_svg = "C:\\Files\\Programming\\TwitterPipeline\\JS\\"
 let chet_svg_path = "G:\\TwitterPipeline\\all_params_images\\SVG\\"
 let chet_png_path = "G:\\TwitterPipeline\\all_params_images\\PNG\\"
 let python_scripts = {
@@ -48,7 +49,24 @@ let tweet_image_name;
 let possible_rotations = [30, 45, 60, 90, 180];
 let rotation = possible_rotations[Math.floor(Math.random() * possible_rotations.length)];
 // let sw = [4, 3, 2, 1];
-let mode = 'batch';
+
+var generate_image = async (params) => {
+
+    let color_machine = chroma.scale(params.palette)
+    // let image_id = fake.word();
+    let master_controller = new MasterController();
+    master_controller.SetPaths(params.paths.svg, params.paths.png);
+    master_controller.SetStepShape(params.step_shape);
+    master_controller.SetGridSize(params.grid_size);
+    master_controller.SetImageId(params.image_id);
+    master_controller.SetStrokeWeights(params.stroke_weights);
+    master_controller.SetRotation(params.rotation);
+    master_controller.SetSubShapes(params.sub_shapes);
+    master_controller.SetSubStrokeWeights(params.sub_stroke_weights);
+    master_controller.GenerateImage(color_machine);
+}
+
+let mode = 'single';
 
 
 
@@ -112,13 +130,13 @@ else if (mode == 'single') {
 
     let params = {
         paths: {
-            svg: dbg_path,
-            png: dbg_path,
+            svg: dbg_path_svg,
+            png: dbg_path_png,
         },
         step_shape: 2,
         grid_size: 1,
         palette: palettes[Math.floor(Math.random() * palettes.length)],
-        image_id: fake.word(),
+        image_id: 'chez',//fake.word(),
         stroke_weights: [1, .9, .8, .7, .6, .5],
         rotation: 90,
         sub_shapes: [1, 2],
@@ -241,22 +259,6 @@ function shuffleArray(array) {
         array[i] = array[j];
         array[j] = temp;
     }
-}
-
-var generate_image = async (params) => {
-
-    let color_machine = chroma.scale(params.palette)
-    // let image_id = fake.word();
-    let master_controller = new MasterController();
-    master_controller.SetPaths(params.paths.svg, params.paths.png);
-    master_controller.SetStepShape(params.step_shape);
-    master_controller.SetGridSize(params.grid_size);
-    master_controller.SetImageId(params.image_id);
-    master_controller.SetStrokeWeights(params.stroke_weights);
-    master_controller.SetRotation(params.rotation);
-    master_controller.SetSubShapes(params.sub_shapes);
-    master_controller.SetSubStrokeWeights(params.sub_stroke_weights);
-    master_controller.GenerateImage(color_machine);
 }
 
 var generate_image_batch = async (keys, values, palette) => {

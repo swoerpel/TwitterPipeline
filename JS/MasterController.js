@@ -106,9 +106,13 @@ class MasterController {
 
     DrawGrids(grid) {
         let index = 0;
+
+        // console.log(linear_grid, '-> linear_grid')
+        // console.log(grid, '-> regular_grid')
+        let spiral = GenerateSpiralArray(this.vital_params.grid_size.x, this.vital_params.grid_size.y)
+        let linear_spiral = [].concat(...spiral);
+        console.log('linear spiral', linear_spiral)
         let linear_grid = [].concat(...grid);
-        console.log(linear_grid, '-> linear_grid')
-        console.log(grid, '-> regular_grid')
 
         for (let i = 0; i < this.vital_params.grid_size.x; i++) {
             for (let j = 0; j < this.vital_params.grid_size.y; j++) {
@@ -116,7 +120,8 @@ class MasterController {
                     x: this.paper_width / this.vital_params.grid_size.x * i,
                     y: this.paper_height / this.vital_params.grid_size.y * j
                 }
-                let current_grid = linear_grid[index];
+                let current_grid = linear_grid[linear_spiral[index]];
+                console.log(index, linear_grid[linear_spiral[index]])
                 // console.log('current_grid', current_grid[index])
                 // console.log('linear_grid', linear_grid)
                 let grid_values = {
@@ -144,7 +149,7 @@ class MasterController {
 
     SetColors(index, color_grid) {
         let colors = []
-        if (index == 0) { // 
+        if (index == 0) { // only working index
             for (let k = 0; k < color_grid.length; k++)
                 colors.push(round(color_grid[k] / Templates.ant_attributes.color.max_color, 3));
         } else if (index == 1) {
@@ -155,9 +160,9 @@ class MasterController {
                 colors.push(Math.random());
         }
 
-        //remove later, just for debugging
-        for (let k = 0; k < color_grid.length; k++)
-            colors.push(Math.random());
+        // //remove later, just for debugging
+        // for (let k = 0; k < color_grid.length; k++)
+        //     colors.push(Math.random());
         return colors
     }
 
@@ -339,6 +344,69 @@ class MasterController {
 
 }
 module.exports = MasterController;
+
+
+
+function GenerateSpiralArray(width, height) {
+    // let width = 8;
+    // let height = 8;
+    let step_count = 0;
+    let max_step_count = width * height;
+    let origin = {
+        x: Math.floor(width / 2),
+        y: Math.floor(height / 2),
+    }
+    let grid = new Array(width).fill().map(() => new Array(height).fill(0));
+    let current_direction = 2;
+    let distance = 1;
+    let direction_change_count = 0;
+    let position = {
+        x: origin.x,
+        y: origin.y,
+
+    }
+    // console.log('positionX positionY step_count direction')
+
+    while (step_count < max_step_count) {
+        for (let i = 0; i < distance; i++) {
+            grid[position.x][position.y] = (step_count)
+            step_count++;
+            if (current_direction == 0) {
+
+                position = {
+                    x: (position.x + 1) % width,
+                    y: position.y
+                }
+            }
+            else if (current_direction == 1) {
+                position = {
+                    x: position.x,
+                    y: (position.y + 1) % height,
+                }
+            }
+            else if (current_direction == 2) {
+                position = {
+                    x: (position.x < 0) ? width - 1 : position.x - 1,
+                    y: position.y
+                }
+            }
+            else if (current_direction == 3) {
+                position = {
+                    x: position.x,
+                    y: (position.y < 0) ? height - 1 : position.y - 1,
+                }
+            }
+        }
+        current_direction = (current_direction + 1) % 4
+        direction_change_count++
+        if (direction_change_count == 2) {
+            distance++;
+            direction_change_count = 0;
+        }
+    }
+    console.log(grid, '-> Spiral Layering')
+    return grid
+}
 
 function createBlock(radius) {
     var group = new paper.Group();

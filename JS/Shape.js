@@ -1,12 +1,19 @@
-var paper;// = require('paper-jsdom-canvas');
+var paper = require('paper-jsdom-canvas');
 var Templates = require('./Templates.js');
 
-module.exports = {
 
-    SetPaper: (p) => { paper = p; console.log('set paper', Object.keys(p)); },
+class Shape {
+    SetPaper(grid_size) {
+        let tile_width = Templates.png_dims.width / grid_size.x
+        let tile_height = Templates.png_dims.height / grid_size.y
+        this.paper_width = tile_width * grid_size.x
+        this.paper_height = tile_height * grid_size.y
+        paper.setup(new paper.Size(this.paper_width, this.paper_height))
+    };
 
-    DrawBackground: (color = 'black') => {
+    DrawBackground(color = 'black') {
         // console.log('draw background', paper)
+        console.log(paper.view)
         var rect = new paper.Path.Rectangle({
             point: [0, 0],
             size: [paper.view.size.width, paper.view.size.height],
@@ -15,9 +22,10 @@ module.exports = {
         });
         rect.sendToBack();
         rect.fillColor = color;
-    },
+    }
 
-    DrawSquares: (grid_values, colors, color_machine, paper) => {
+
+    DrawSquares(grid_values, colors, color_machine) {
         console.log('in draw squares')
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
@@ -40,9 +48,9 @@ module.exports = {
                 });
             }
         }
-    },
+    }
 
-    DrawCircles: (grid_values, colors, color_machine) => {
+    DrawCircles(grid_values, colors, color_machine) {
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let radius = grid_values.width / grid_values.sub_shape / 2
@@ -64,12 +72,12 @@ module.exports = {
                 });
             }
         }
-    },
+    }
 
 
-    DrawTriangles: (grid_values, colors, color_machine) => {
+    DrawTriangles(grid_values, colors, color_machine) {
         console.log('in draw triangles')
-
+        console.log('paper', paper)
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let radius = grid_values.width / grid_values.sub_shape / 2
@@ -107,9 +115,9 @@ module.exports = {
                 });
             }
         }
-    },
+    }
 
-    DrawCustomShape: (grid_values, colors, color_machine) => {
+    DrawCustomShape(grid_values, colors, color_machine) {
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let radius = grid_values.width / grid_values.sub_shape / 2
@@ -165,3 +173,6 @@ module.exports = {
         }
     }
 }
+
+module.exports = Shape;
+

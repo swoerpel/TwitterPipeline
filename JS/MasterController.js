@@ -1,6 +1,5 @@
 var fs = require('fs');
 var path = require('path');
-var paper = require('paper-jsdom-canvas');
 
 var fake = require('fake-words');
 var svg2img = require('svg2img');
@@ -41,14 +40,17 @@ class MasterController {
         this.color_machine = color_machine;
         console.log('generating new image...')
         this.vital_params = this.GenerateVitalParams(this.step_shape)
-        let tile_width = Templates.png_dims.width / this.vital_params.grid_size.x
-        let tile_height = Templates.png_dims.height / this.vital_params.grid_size.y
-        this.paper_width = tile_width * this.vital_params.grid_size.x
-        this.paper_height = tile_height * this.vital_params.grid_size.y
-        paper.setup(new paper.Size(this.paper_width, this.paper_height))
+        // let tile_width = Templates.png_dims.width / this.vital_params.grid_size.x
+        // let tile_height = Templates.png_dims.height / this.vital_params.grid_size.y
+        // this.paper_width = tile_width * this.vital_params.grid_size.x
+        // this.paper_height = tile_height * this.vital_params.grid_size.y
+        // paper.setup(new paper.Size(this.paper_width, this.paper_height))
         console.log('pre set paper')
-        Shape.SetPaper(paper);
-        Shape.DrawBackground()
+        this.shape = new Shape({
+            x: this.vital_params.grid_size.x,
+            y: this.vital_params.grid_size.y
+        })
+        this.shape.DrawBackground();
         // this.DrawBackground(color_machine(Math.random()).hex())
         // console.log('vital params', this.vital_params)
         let grid = new Grid(this.vital_params)
@@ -56,6 +58,7 @@ class MasterController {
         // console.log('grid layers', grid_layers)
         this.DrawGrids(grid_layers)
         console.log('generating SVG');
+        // this.Shape
         let svg = paper.project.exportSVG({
             asString: true,
             precision: 2,
@@ -141,13 +144,13 @@ class MasterController {
 
                 console.log(this.vital_params.step_shape.name == 'triangle')
                 if (this.vital_params.step_shape.name == 'square')
-                    Shape.DrawSquares(grid_values, colors, this.color_machine);
+                    this.shape.DrawSquares(grid_values, colors, this.color_machine);
                 if (this.vital_params.step_shape.name == 'circle')
-                    Shape.DrawCircles(grid_values, colors, this.color_machine);
+                    this.shape.DrawCircles(grid_values, colors, this.color_machine);
                 if (this.vital_params.step_shape.name == 'triangle')
-                    Shape.DrawTriangles(grid_values, colors, this.color_machine);
+                    this.shape.DrawTriangles(grid_values, colors, this.color_machine);
                 if (this.vital_params.step_shape.name == 'cube')
-                    Shape.DrawCustomShape(paper, grid_values, colors, this.color_machine);
+                    this.shape.DrawCustomShape(paper, grid_values, colors, this.color_machine);
             }
         }
 

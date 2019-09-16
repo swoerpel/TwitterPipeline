@@ -104,22 +104,35 @@ class MasterController {
         this.image_id = image_id
     }
 
+    linearize_array(grid) {
+        return [...grid.map(((row) => { return [...row] }))]
+    }
+
     DrawGrids(grid) {
         // console.log('vital params', this.vital_params)
+        let index = 0;
+        // let current_grid = this.linearize_array(grid);
+
+        let linear_grid = [].concat(...grid);
+
         for (let i = 0; i < this.vital_params.grid_size.x; i++) {
             for (let j = 0; j < this.vital_params.grid_size.y; j++) {
                 let origin = {
                     x: this.paper_width / this.vital_params.grid_size.x * i,
                     y: this.paper_height / this.vital_params.grid_size.y * j
                 }
+                let current_grid = linear_grid[index];
+                // console.log('current_grid', current_grid[index])
+                // console.log('linear_grid', linear_grid)
                 let grid_values = {
                     origin: origin,
                     width: this.paper_width / this.vital_params.grid_size.x,
-                    color: grid[i][j].color,
-                    sub_shape: grid[i][j].sub_shape,
-                    stroke_weight: grid[i][j].stroke_weight,
-                    rotation: grid[i][j].rotation
+                    color: current_grid.color,
+                    sub_shape: current_grid.sub_shape,
+                    stroke_weight: current_grid.stroke_weight,
+                    rotation: current_grid.rotation
                 }
+                index++;
                 let colors = this.SetColors(Templates.ant_attributes.color.style, grid_values.color)
 
                 if (this.vital_params.step_shape.name == 'square')

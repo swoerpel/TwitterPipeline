@@ -39,10 +39,8 @@ let python_scripts = {
 }
 // let python_path = "C:\\Files\\Programming\\TwitterPipeline\\Python\\"
 
-let iteration_time = .5; //minutes
-iteration_time *= 60; //seconds
-iteration_time *= 1000; //miliseconds
-var T = new Twit(config);
+
+
 let palettes = Object.keys(chroma.brewer)
 let counter = 0;
 let tweet_path;
@@ -50,23 +48,9 @@ let tweet_image_name;
 let possible_rotations = [30, 45, 60, 90, 180];
 let rotation = possible_rotations[Math.floor(Math.random() * possible_rotations.length)];
 // let sw = [4, 3, 2, 1];
-let mode = 'single';
+let mode = 'batch';
 
-var generate_image = async (params) => {
 
-    let color_machine = chroma.scale(params.palette)
-    // let image_id = fake.word();
-    let master_controller = new MasterController();
-    master_controller.SetPaths(params.paths.svg, params.paths.png);
-    master_controller.SetStepShape(params.step_shape);
-    master_controller.SetGridSize(params.grid_size);
-    master_controller.SetImageId(params.image_id);
-    master_controller.SetStrokeWeights(params.stroke_weights);
-    master_controller.SetRotation(params.rotation);
-    master_controller.SetSubShapes(params.sub_shapes);
-    master_controller.SetSubStrokeWeights(params.sub_stroke_weights);
-    master_controller.GenerateImage(color_machine);
-}
 
 if (mode == 'debug') {
 
@@ -145,52 +129,22 @@ else if (mode == 'single') {
 
 }
 else if (mode == 'batch') {
+    let iteration_time = .5; //minutes
+    iteration_time *= 60; //seconds
+    iteration_time *= 1000; //miliseconds
     let PC = new ParameterController();
     let all_param_combos = PC.GenerateParams();
-    // let image_count = 0;
-    // let J5 = schedule.scheduleJob(rule, () => {
-    let J5 = setInterval(() => { generate_image(); }, iteration_time);
-    let remaining_combos = [...Array(all_param_combos.length).keys()];
-    shuffleArray(remaining_combos);
-    // console.log(remaining_combos)
-    var generate_image = async () => {
-        let i = counter;
-        counter++;
-        let palette = palettes[Math.floor(Math.random() * palettes.length)];
-        let color_machine = chroma.scale(palette)
-        console.log('parameter index', i)
-        // let index = remaining_combos[counter]
-        // remaining_combos.remove()
+    let J5 = setInterval(() => {
         let index = Math.floor(Math.random() * all_param_combos.length)
-        let name = fake.word();
-        for (let j = 0; j < 3; j++) {
-            // let rand = Math.floor(Math.random() * all_param_combos.length)
-            let keys = all_param_combos[index].keys
-            let values = all_param_combos[index].values
-            console.log('values', values)
-            let image_id = keys.join('_')
-            image_id = counter.toString() + '-' +
-                j.toString() + '_' +
-                image_id + '_' +
-                palette + '_' +
-                name
-            console.log(image_id)
-            generate_image(2, image_id, 1, palette);
-            // let master_controller = new MasterController();
-            // master_controller.SetPaths(chet_svg_path, chet_png_path);
-            // master_controller.SetStepShape(j);
-            // master_controller.SetGridSize(1);
-            // master_controller.SetImageId(image_id);
-            // master_controller.SetStrokeWeights(values[0]);
-            // master_controller.SetRotation(values[1]);
-            // master_controller.SetSubShapes(values[2]);
-            // master_controller.SetSubStrokeWeights(values[3]);
-            // master_controller.GenerateImage(color_machine);
-        }
-    }
+        let keys = all_param_combos[index].keys
+        let values = all_param_combos[index].values
+        let palette = palettes[Math.floor(Math.random() * palettes.length)];
+        generate_image_batch(keys, values, palette);
+    }, iteration_time);
 
 }
 else if (mode == 'twitter') {
+    var T = new Twit(config);
     let master_controller = new MasterController();
 
     let J1 = schedule.scheduleJob(T1, () => {
@@ -287,4 +241,62 @@ function shuffleArray(array) {
         array[i] = array[j];
         array[j] = temp;
     }
+}
+
+var generate_image = async (params) => {
+
+    let color_machine = chroma.scale(params.palette)
+    // let image_id = fake.word();
+    let master_controller = new MasterController();
+    master_controller.SetPaths(params.paths.svg, params.paths.png);
+    master_controller.SetStepShape(params.step_shape);
+    master_controller.SetGridSize(params.grid_size);
+    master_controller.SetImageId(params.image_id);
+    master_controller.SetStrokeWeights(params.stroke_weights);
+    master_controller.SetRotation(params.rotation);
+    master_controller.SetSubShapes(params.sub_shapes);
+    master_controller.SetSubStrokeWeights(params.sub_stroke_weights);
+    master_controller.GenerateImage(color_machine);
+}
+
+var generate_image_batch = async (keys, values, palette) => {
+    counter++;
+    let name = fake.word();
+    let base_id = keys.join('_');
+    let id_params = [
+        counter,
+        name,
+        base_id
+    ]
+    console.log('values ->', values, 'colors ->', palette)
+    let params = {
+        paths: {
+            svg: chet_svg_path,
+            png: chet_png_path,
+        },
+        step_shape: 0,
+        grid_size: 1,
+        palette: palette,
+        image_id: generate_id(id_params, 0),
+        stroke_weights: values[0],
+        rotation: values[1],
+        sub_shapes: values[2],
+        sub_stroke_weights: values[3],
+    }
+    generate_image(params);
+    params.step_shape = 1;
+    params.image_id = generate_id(id_params, 1)
+    generate_image(params);
+    params.step_shape = 2;
+    params.image_id = generate_id(id_params, 2)
+    generate_image(params);
+}
+
+var generate_id = (id_params, step_shape) => {
+    let image_id = '';
+    id_params.map((ele) => {
+        image_id += (ele.toString() + '_');
+    });
+    image_id += step_shape.toString()
+    return image_id;
 }

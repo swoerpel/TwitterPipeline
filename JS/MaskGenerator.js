@@ -47,7 +47,6 @@ class MaskGenerator {
                 grid[position.x][position.y] = (step_count + 1)
                 step_count++;
                 if (current_direction == 0) {
-
                     position = {
                         x: (position.x + 1) % width,
                         y: position.y

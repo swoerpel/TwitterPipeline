@@ -57,46 +57,46 @@ var generate_image = async (step_shape, image_id, grid_size) => {
     let color_machine = chroma.scale(palette)
     // let image_id = fake.word();
     let master_controller = new MasterController();
-    master_controller.SetPaths(svg_path, png_path);
+    master_controller.SetPaths(dbg_path, dbg_path);
     master_controller.SetStepShape(step_shape);
     master_controller.SetGridSize(grid_size);
     master_controller.SetImageId(image_id);
-    master_controller.SetStrokeWeights([1, .9, .8, .7, .6, .5]);
+    master_controller.SetStrokeWeights([1, .9, .8, .7, .6, .5, 0]);
     master_controller.SetRotation(90);
     master_controller.SetSubShapes([1, 2]);
-    master_controller.SetSubStrokeWeights([1, .5]);
+    master_controller.SetSubStrokeWeights([1, .5, 0]);
     master_controller.GenerateImage(color_machine);
 }
 
 if (mode == 'debug') {
 
-    // var generate_image = async (step_shape, image_id, grid_size) => {
+    var generate_image = async (step_shape, image_id, grid_size) => {
 
-    //     let color_machine = chroma.scale(palette)
-    //     // let image_id = fake.word();
-    //     let master_controller = new MasterController();
-    //     master_controller.SetPaths(svg_path, png_path);
-    //     master_controller.SetStepShape(step_shape);
-    //     master_controller.SetGridSize(grid_size);
-    //     master_controller.SetImageId(image_id);
-    //     master_controller.SetStrokeWeights([1, .9, .8, .7, .6, .5]);
-    //     master_controller.SetRotation(90);
-    //     master_controller.SetSubShapes([1, 2]);
-    //     master_controller.SetSubStrokeWeights([1, .5]);
-    //     master_controller.GenerateImage(color_machine);
-    // }
-    // let palette = palettes[Math.floor(Math.random() * palettes.length)];
-    // let fake_word = fake.word();
-    // let id1 = fake_word + '0'
-    // let id2 = fake_word + '1'
-    // let id3 = fake_word + '2'
-    // generate_image(2, id1, 0, palette);
+        let color_machine = chroma.scale(palette)
+        // let image_id = fake.word();
+        let master_controller = new MasterController();
+        master_controller.SetPaths(svg_path, png_path);
+        master_controller.SetStepShape(step_shape);
+        master_controller.SetGridSize(grid_size);
+        master_controller.SetImageId(image_id);
+        master_controller.SetStrokeWeights([1, .9, .8, .7, .6, .5]);
+        master_controller.SetRotation(90);
+        master_controller.SetSubShapes([1, 2]);
+        master_controller.SetSubStrokeWeights([1, .5]);
+        master_controller.GenerateImage(color_machine);
+    }
+    let palette = palettes[Math.floor(Math.random() * palettes.length)];
+    let fake_word = fake.word();
+    let id1 = fake_word + '0'
+    let id2 = fake_word + '1'
+    let id3 = fake_word + '2'
+    generate_image(2, id1, 0, palette);
     // generate_image(2, id2, 1, palette);
     // generate_image(2, id3, 2, palette);
     let MG = new mask.MaskGenerator(png_path)
     // let mask1_path = 'm1' + id1
     // MG.GenerateMask({ width: 400, height: 400 }, 0, mask1_path)
-    MG.GenerateParade();
+    // MG.GenerateParade();
     // // python script testing
     // let image_paths = [
     //     png_path + id1,

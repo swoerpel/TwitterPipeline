@@ -280,6 +280,7 @@ var generate_image_batch = async (keys, values, palette) => {
             png: chet_png_path,
         },
         step_shape: 0,
+        grid_scale: { x: 1, y: 1 },
         grid_size: 1,
         palette: palette,
         image_id: generate_id(id_params, 0),

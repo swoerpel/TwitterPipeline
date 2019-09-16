@@ -104,16 +104,11 @@ class MasterController {
         this.image_id = image_id
     }
 
-    linearize_array(grid) {
-        return [...grid.map(((row) => { return [...row] }))]
-    }
-
     DrawGrids(grid) {
-        // console.log('vital params', this.vital_params)
         let index = 0;
-        // let current_grid = this.linearize_array(grid);
-
         let linear_grid = [].concat(...grid);
+        console.log(linear_grid, '-> linear_grid')
+        console.log(grid, '-> regular_grid')
 
         for (let i = 0; i < this.vital_params.grid_size.x; i++) {
             for (let j = 0; j < this.vital_params.grid_size.y; j++) {
@@ -136,13 +131,13 @@ class MasterController {
                 let colors = this.SetColors(Templates.ant_attributes.color.style, grid_values.color)
 
                 if (this.vital_params.step_shape.name == 'square')
-                    this.DrawSquares(grid_values, colors);
+                    this.DrawSquares(index, grid_values, colors);
                 if (this.vital_params.step_shape.name == 'circle')
-                    this.DrawCircles(grid_values, colors);
+                    this.DrawCircles(index, grid_values, colors);
                 if (this.vital_params.step_shape.name == 'triangle')
-                    this.DrawTriangles(grid_values, colors);
+                    this.DrawTriangles(index, grid_values, colors);
                 if (this.vital_params.step_shape.name == 'cube')
-                    this.DrawCubes(grid_values, colors);
+                    this.DrawCubes(index, grid_values, colors);
             }
         }
     }
@@ -166,7 +161,7 @@ class MasterController {
         return colors
     }
 
-    DrawSquares(grid_values, colors) {
+    DrawSquares(index, grid_values, colors) {
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k
@@ -190,7 +185,7 @@ class MasterController {
         }
     }
 
-    DrawCircles(grid_values, colors) {
+    DrawCircles(index, grid_values, colors) {
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let radius = grid_values.width / grid_values.sub_shape / 2
@@ -214,7 +209,7 @@ class MasterController {
         }
     }
 
-    DrawTriangles(grid_values, colors) {
+    DrawTriangles(index, grid_values, colors) {
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let radius = grid_values.width / grid_values.sub_shape / 2
@@ -253,7 +248,7 @@ class MasterController {
             }
         }
     }
-    DrawCubes(grid_values, colors) {
+    DrawCubes(index, grid_values, colors) {
         for (let k = 0; k < grid_values.sub_shape; k++) {
             for (let l = 0; l < grid_values.sub_shape; l++) {
                 let radius = grid_values.width / grid_values.sub_shape / 2

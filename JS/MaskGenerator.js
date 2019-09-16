@@ -22,9 +22,7 @@ class MaskGenerator {
     }
 
 
-    GenerateParade() {
-        let width = 8;
-        let height = 8;
+    GenerateSpiralArray(width, height) {
         let step_count = 0;
         let max_step_count = width * height;
         let origin = {
@@ -44,7 +42,7 @@ class MaskGenerator {
 
         while (step_count < max_step_count) {
             for (let i = 0; i < distance; i++) {
-                grid[position.x][position.y] = (step_count + 1)
+                grid[position.x][position.y] = (step_count)
                 step_count++;
                 if (current_direction == 0) {
 
@@ -80,7 +78,7 @@ class MaskGenerator {
             }
         }
         console.log(grid)
-
+        return grid
     }
 
 

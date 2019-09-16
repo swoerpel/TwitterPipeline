@@ -50,21 +50,21 @@ let tweet_image_name;
 let possible_rotations = [30, 45, 60, 90, 180];
 let rotation = possible_rotations[Math.floor(Math.random() * possible_rotations.length)];
 // let sw = [4, 3, 2, 1];
-let mode = 'debug';
+let mode = 'single';
 
-var generate_image = async (step_shape, image_id, grid_size) => {
+var generate_image = async (params) => {
 
-    let color_machine = chroma.scale(palette)
+    let color_machine = chroma.scale(params.palette)
     // let image_id = fake.word();
     let master_controller = new MasterController();
-    master_controller.SetPaths(svg_path, png_path);
-    master_controller.SetStepShape(step_shape);
-    master_controller.SetGridSize(grid_size);
-    master_controller.SetImageId(image_id);
-    master_controller.SetStrokeWeights([1, .9, .8, .7, .6, .5]);
-    master_controller.SetRotation(90);
-    master_controller.SetSubShapes([1, 2]);
-    master_controller.SetSubStrokeWeights([1, .5]);
+    master_controller.SetPaths(params.paths.svg, params.paths.png);
+    master_controller.SetStepShape(params.step_shape);
+    master_controller.SetGridSize(params.grid_size);
+    master_controller.SetImageId(params.image_id);
+    master_controller.SetStrokeWeights(params.stroke_weights);
+    master_controller.SetRotation(params.rotation);
+    master_controller.SetSubShapes(params.sub_shapes);
+    master_controller.SetSubStrokeWeights(params.sub_stroke_weights);
     master_controller.GenerateImage(color_machine);
 }
 
@@ -122,6 +122,26 @@ if (mode == 'debug') {
     //     console.log("Closed");
     // });
 
+
+}
+else if (mode == 'single') {
+
+    let params = {
+        paths: {
+            svg: dbg_path,
+            png: dbg_path,
+        },
+        step_shape: 2,
+        grid_size: 1,
+        palette: palettes[Math.floor(Math.random() * palettes.length)],
+        image_id: fake.word(),
+        stroke_weights: [1, .9, .8, .7, .6, .5],
+        rotation: 90,
+        sub_shapes: [1, 2],
+        sub_stroke_weights: [1, .5],
+    }
+
+    generate_image(params);
 
 }
 else if (mode == 'batch') {

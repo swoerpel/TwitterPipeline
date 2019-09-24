@@ -57,6 +57,7 @@ var generate_image = async (params) => {
     let master_controller = new MasterController();
     master_controller.SetPaths(params.paths.svg, params.paths.png);
     master_controller.SetStepShape(params.step_shape);
+    master_controller.SetStepPath(params.step_path);
     master_controller.SetGridScale(params.grid_scale);
     master_controller.SetGridSize(params.grid_size);
     master_controller.SetImageId(params.image_id);
@@ -134,13 +135,14 @@ else if (mode == 'single') {
             svg: dbg_path_svg,
             png: dbg_path_png,
         },
-        step_shape: 1,
-        grid_scale: { x: 2, y: 1 },
-        grid_size: 2,
+        step_shape: 2,
+        step_path: 1,
+        grid_scale: { x: 1, y: 1 },
+        grid_size: 3,
         palette: palettes[Math.floor(Math.random() * palettes.length)],
         image_id: fake.word(),
-        // stroke_weights: [2, 1.0],
-        stroke_weights: [2, 1.5, 1, .5],
+        stroke_weights: [8, 4, 2, 1],
+        // stroke_weights: [2, 1.5, 1, .5],
         rotation: 90,
         sub_shapes: [1, 2],
         sub_stroke_weights: [1, 0.5],

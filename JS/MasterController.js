@@ -1,5 +1,4 @@
 var fs = require('fs');
-var path = require('path');
 var paper = require('paper-jsdom-canvas');
 
 var fake = require('fake-words');
@@ -7,6 +6,8 @@ var svg2img = require('svg2img');
 var Templates = require('./Templates.js');
 var Grid = require('./Grid.js');
 var ColorSequencer = require('./ColorSequencer.js');
+var Path = require('./Path.js');
+
 // var Shape = require('./Shape.js')
 
 
@@ -28,6 +29,7 @@ class MasterController {
             rule_template: Templates.rule_templates[this.step_shape],
             grid_size: Templates.grid_sizes[this.grid_size_index],
             stroke_weights: Templates.stroke_weight_templates[this.step_shape],
+            step_path: Templates.step_paths.index,
             ant_count: 20,
             ant_origins_random: true,
             duration: 5000,
@@ -56,7 +58,6 @@ class MasterController {
         DrawBackground();
         let grid = new Grid(this.vital_params)
         let grid_layers = grid.WalkAnts(this.vital_params.duration)
-        console.log('grid layers origin', grid_layers[0][0].origin, grid_layers[1][0].origin)
 
         this.DrawGrids(grid_layers)
         console.log('generating SVG');
@@ -81,6 +82,10 @@ class MasterController {
 
     SetStepShape(step_shape) {
         this.step_shape = step_shape;
+    }
+
+    SetStepPath(step_path) {
+        Templates.step_paths.index = step_path;
     }
 
     SetStrokeWeights(weights) {
@@ -125,35 +130,18 @@ class MasterController {
     }
 
     DrawGrids(grid) {
-        // let index = 0;
-        let spiral = GenerateSpiralArray(this.vital_params.grid_size.x, this.vital_params.grid_size.y)
-        let linear_spiral = [].concat(...spiral);
-        let origins = []
-        for (let i = 0; i < this.vital_params.grid_size.x; i++) {
-            for (let j = 0; j < this.vital_params.grid_size.y; j++) {
-                origins.push({
-                    x: this.paper_width / this.vital_params.grid_size.x * i,
-                    y: this.paper_height / this.vital_params.grid_size.y * j
-                })
-            }
-        }
-        let linear_origins = [].concat(...origins)
-        let ordered_origins = []
-        for (let i = 0; i < origins.length; i++) {
-            let index = linear_spiral.indexOf(i)
-            ordered_origins.push(linear_origins[index]);
-        }
+        let path_machine = new Path(this.vital_params.grid_size.x,
+            this.vital_params.grid_size.y,
+            this.paper_width,
+            this.paper_height);
+
+        let step_path = path_machine.GeneratePath(this.vital_params.step_path);
         let origin_index = 0;
         for (let i = 0; i < this.vital_params.grid_size.x; i++) {
             for (let j = 0; j < this.vital_params.grid_size.y; j++) {
-                // let origin = {
-                //     x: this.paper_width / this.vital_params.grid_size.x * i,
-                //     y: this.paper_height / this.vital_params.grid_size.y * j
-                // }
-                let origin = ordered_origins[origin_index];
+                let origin = step_path[origin_index];
                 origin_index++;
                 let current_grid = grid[i][j];
-                console.log(i, j, 'stack order', origin)
                 let grid_values = {
                     origin: origin,
                     width: this.paper_width / this.vital_params.grid_size.x,
@@ -385,61 +373,61 @@ function DrawCustomShape(grid_values, colors, color_machine) {
     }
 }
 
-function GenerateSpiralArray(width, height) {
-    let step_count = 0;
-    let max_step_count = width * height;
-    let origin = {
-        x: Math.floor(width / 2),
-        y: Math.floor(height / 2),
-    }
-    let grid = new Array(width).fill().map(() => new Array(height).fill(0));
-    let current_direction = 2;
-    let distance = 1;
-    let direction_change_count = 0;
-    let position = {
-        x: origin.x,
-        y: origin.y,
+// function GenerateSpiralArray(width, height) {
+//     let step_count = 0;
+//     let max_step_count = width * height;
+//     let origin = {
+//         x: Math.floor(width / 2),
+//         y: Math.floor(height / 2),
+//     }
+//     let grid = new Array(width).fill().map(() => new Array(height).fill(0));
+//     let current_direction = 2;
+//     let distance = 1;
+//     let direction_change_count = 0;
+//     let position = {
+//         x: origin.x,
+//         y: origin.y,
 
-    }
-    // console.log('positionX positionY step_count direction')
+//     }
+//     // console.log('positionX positionY step_count direction')
 
-    while (step_count < max_step_count) {
-        for (let i = 0; i < distance; i++) {
-            grid[position.x][position.y] = (step_count)
-            step_count++;
-            if (current_direction == 0) {
+//     while (step_count < max_step_count) {
+//         for (let i = 0; i < distance; i++) {
+//             grid[position.x][position.y] = (step_count)
+//             step_count++;
+//             if (current_direction == 0) {
 
-                position = {
-                    x: (position.x + 1) % width,
-                    y: position.y
-                }
-            }
-            else if (current_direction == 1) {
-                position = {
-                    x: position.x,
-                    y: (position.y + 1) % height,
-                }
-            }
-            else if (current_direction == 2) {
-                position = {
-                    x: (position.x < 0) ? width - 1 : position.x - 1,
-                    y: position.y
-                }
-            }
-            else if (current_direction == 3) {
-                position = {
-                    x: position.x,
-                    y: (position.y < 0) ? height - 1 : position.y - 1,
-                }
-            }
-        }
-        current_direction = (current_direction + 1) % 4
-        direction_change_count++
-        if (direction_change_count == 2) {
-            distance++;
-            direction_change_count = 0;
-        }
-    }
-    console.log(grid)
-    return grid
-}
+//                 position = {
+//                     x: (position.x + 1) % width,
+//                     y: position.y
+//                 }
+//             }
+//             else if (current_direction == 1) {
+//                 position = {
+//                     x: position.x,
+//                     y: (position.y + 1) % height,
+//                 }
+//             }
+//             else if (current_direction == 2) {
+//                 position = {
+//                     x: (position.x < 0) ? width - 1 : position.x - 1,
+//                     y: position.y
+//                 }
+//             }
+//             else if (current_direction == 3) {
+//                 position = {
+//                     x: position.x,
+//                     y: (position.y < 0) ? height - 1 : position.y - 1,
+//                 }
+//             }
+//         }
+//         current_direction = (current_direction + 1) % 4
+//         direction_change_count++
+//         if (direction_change_count == 2) {
+//             distance++;
+//             direction_change_count = 0;
+//         }
+//     }
+//     console.log(grid)
+//     return grid
+// }

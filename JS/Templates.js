@@ -124,6 +124,10 @@ var rotation_attributes = {
     delta: 180, //Math.PI / 2
 }
 
+var step_paths = {
+    index: 0
+}
+
 // ARRAY
 var ant_attributes = { //square
     color: color_attributes,
@@ -137,6 +141,7 @@ exports.grid_sizes = grid_sizes;
 exports.step_shapes = step_shapes;
 exports.stroke_weight_templates = stroke_weight_templates;
 exports.ant_attributes = ant_attributes;
-exports.consts = consts
-exports.png_dims = png_dims
-exports.scale_sizes = scale_sizes
+exports.consts = consts;
+exports.png_dims = png_dims;
+exports.scale_sizes = scale_sizes;
+exports.step_paths = step_paths;

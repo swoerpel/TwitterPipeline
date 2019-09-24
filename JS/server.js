@@ -32,7 +32,7 @@ let png_path = "C:\\Files\\Art\\Tweets\\PNG\\"
 let combined_png_path = "C:\\Files\\Art\\Tweets\\CPNG\\"
 let png_posted_path = "C:\\Files\\Art\\Tweets\\Posted\\"
 let dbg_path_png = "C:\\Files\\Art\\Tweets\\Debug\\"
-let dbg_path_svg = "C:\\Files\\Programming\\TwitterPipeline\\JS\\"
+let dbg_path_svg = "C:\\Files\\Art\\Tweets\\Debug\\"
 let chet_svg_path = "G:\\TwitterPipeline\\all_params_images\\SVG\\"
 let chet_png_path = "G:\\TwitterPipeline\\all_params_images\\PNG\\"
 let python_scripts = {
@@ -135,15 +135,15 @@ else if (mode == 'single') {
             png: dbg_path_png,
         },
         step_shape: 1,
-        grid_scale: { x: 1, y: 1 },
+        grid_scale: { x: 2, y: 1 },
         grid_size: 2,
         palette: palettes[Math.floor(Math.random() * palettes.length)],
-        image_id: 'chez',//fake.word(),
+        image_id: fake.word(),
         // stroke_weights: [2, 1.0],
-        stroke_weights: [4, 2, 1, .5],
+        stroke_weights: [2, 1.5, 1, .5],
         rotation: 90,
-        sub_shapes: [1, 2, 4],
-        sub_stroke_weights: [1, .5],
+        sub_shapes: [1, 2],
+        sub_stroke_weights: [1, 0.5],
     }
 
     generate_image(params);

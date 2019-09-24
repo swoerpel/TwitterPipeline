@@ -13,6 +13,8 @@ class Grid {
     }
 
     InitializeGrids() {
+        console.log('init gridsize', this.params.grid_size)
+
         this.grid = new Array(this.params.grid_size.x).fill()
             .map(() => new Array(this.params.grid_size.y).fill({
                 rule: 0,
@@ -22,6 +24,9 @@ class Grid {
                 rotation: [],
             }));
     }
+
+
+
 
     SetupRules() {
         this.all_rules = []
@@ -88,6 +93,7 @@ class Grid {
     }
 
     WalkAnts(steps) {
+
         for (let i = 0; i < steps; i++) {
             this.ants.map((ant) => {
                 let rule_value = this.grid[ant.x][ant.y].rule
@@ -128,6 +134,7 @@ class Grid {
         if (rotation_array.indexOf(value) == -1)
             rotation_array.push(value);
 
+        // console.log(this.grid[ant.x][ant.y].origin, 'update grid')
         let color_array = [...this.grid[ant.x][ant.y].color];
 
         let rand_index = Math.floor(Math.random() * color_array.length)

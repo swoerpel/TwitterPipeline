@@ -39,8 +39,9 @@ class MasterController {
 
     SetupPaper() {
         // console.log(Templates.png_dims)
-        let tile_width = Templates.png_dims.width / this.vital_params.grid_size.x
-        let tile_height = Templates.png_dims.height / this.vital_params.grid_size.y
+        let tile_width = Templates.png_dims.x / this.vital_params.grid_size.x
+        let tile_height = Templates.png_dims.y / this.vital_params.grid_size.y
+        console.log(Templates.png_dims, tile_height)
         this.paper_width = tile_width * this.vital_params.grid_size.x
         this.paper_height = tile_height * this.vital_params.grid_size.y
         paper.setup(new paper.Size(this.paper_width, this.paper_height))
@@ -51,9 +52,12 @@ class MasterController {
         console.log('generating new image...')
         this.vital_params = this.GenerateVitalParams(this.step_shape)
         this.SetupPaper();
+
         DrawBackground();
         let grid = new Grid(this.vital_params)
         let grid_layers = grid.WalkAnts(this.vital_params.duration)
+        console.log('grid layers origin', grid_layers[0][0].origin, grid_layers[1][0].origin)
+
         this.DrawGrids(grid_layers)
         console.log('generating SVG');
         let svg = paper.project.exportSVG({
@@ -93,13 +97,23 @@ class MasterController {
         Templates.ant_attributes.sub_shape.stroke_weights = weights
     }
     SetGridScale(scale) {
-        Templates.scale_sizes.x = scale.y
-        Templates.scale_sizes.y = scale.y
+        // Templates.scale_sizes.x = scale.y
+        // Templates.scale_sizes.y = scale.y
+        this.grid_scale = {
+            x: scale.x,
+            y: scale.y
+        }
         this.SetPngSize()
     }
     SetPngSize() {
-        Templates.png_dims.width *= Templates.scale_sizes.x
-        Templates.png_dims.height *= Templates.scale_sizes.y
+        // Templates.png_dims = {
+        //     x: Templates.png_dims.x * Templates.scale_sizes.x,
+        //     y: Templates.png_dims.x * Templates.scale_sizes.y
+        // }
+        Templates.png_dims.x *= this.grid_scale.x;
+        Templates.png_dims.y *= this.grid_scale.y;
+
+        // console.log(Templates.png_dims, Templates.scale_sizes)
     }
 
     SetGridSize(index) {
@@ -111,22 +125,35 @@ class MasterController {
     }
 
     DrawGrids(grid) {
-        let index = 0;
+        // let index = 0;
         let spiral = GenerateSpiralArray(this.vital_params.grid_size.x, this.vital_params.grid_size.y)
         let linear_spiral = [].concat(...spiral);
-        // console.log('linear spiral', linear_spiral)
-        let linear_grid = [].concat(...grid);
-
+        let origins = []
         for (let i = 0; i < this.vital_params.grid_size.x; i++) {
             for (let j = 0; j < this.vital_params.grid_size.y; j++) {
-                let origin = {
+                origins.push({
                     x: this.paper_width / this.vital_params.grid_size.x * i,
                     y: this.paper_height / this.vital_params.grid_size.y * j
-                }
-                let linear_index = spiral[i][j]//linear_grid[linear_spiral[index]];
-                let current_grid = linear_grid[linear_index];
-                // let current_grid = linear_grid[linear_spiral[index]];
-                // console.log(linear_index)
+                })
+            }
+        }
+        let linear_origins = [].concat(...origins)
+        let ordered_origins = []
+        for (let i = 0; i < origins.length; i++) {
+            let index = linear_spiral.indexOf(i)
+            ordered_origins.push(linear_origins[index]);
+        }
+        let origin_index = 0;
+        for (let i = 0; i < this.vital_params.grid_size.x; i++) {
+            for (let j = 0; j < this.vital_params.grid_size.y; j++) {
+                // let origin = {
+                //     x: this.paper_width / this.vital_params.grid_size.x * i,
+                //     y: this.paper_height / this.vital_params.grid_size.y * j
+                // }
+                let origin = ordered_origins[origin_index];
+                origin_index++;
+                let current_grid = grid[i][j];
+                console.log(i, j, 'stack order', origin)
                 let grid_values = {
                     origin: origin,
                     width: this.paper_width / this.vital_params.grid_size.x,
@@ -135,7 +162,6 @@ class MasterController {
                     stroke_weight: current_grid.stroke_weight,
                     rotation: current_grid.rotation
                 }
-                index++;
                 let colors = this.SetColors(Templates.ant_attributes.color.style, grid_values.color)
                 if (this.vital_params.step_shape.name == 'square')
                     DrawSquares(grid_values, colors, this.color_machine);
@@ -271,6 +297,7 @@ function DrawTriangles(grid_values, colors, color_machine) {
             let local_origin = new paper.Point(x_local_origin, y_local_origin);
             // let origin_circle = new paper.Path.Circle(local_origin, radius)
             // origin_circle.fillColor = 'black'
+            // console.log(grid_values.origin)
             let concentric_sub_stroke_weights;
             if (grid_values.sub_shape == 1)
                 concentric_sub_stroke_weights = grid_values.stroke_weight;

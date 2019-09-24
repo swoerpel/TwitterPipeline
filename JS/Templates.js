@@ -80,8 +80,8 @@ var grid_sizes = [
 ]
 
 var png_dims = {
-    width: 2400 * scale_sizes.x,
-    height: 2400 * scale_sizes.y
+    x: 2400,
+    y: 2400
 }
 
 var stroke_weight_templates = [

@@ -136,16 +136,16 @@ else if (mode == 'single') {
             png: dbg_path_png,
         },
         step_shape: 2,
-        step_path: 1,
+        step_path: 2,
         grid_scale: { x: 1, y: 1 },
-        grid_size: 3,
+        grid_size: 2,
         palette: palettes[Math.floor(Math.random() * palettes.length)],
         image_id: fake.word(),
-        stroke_weights: [8, 4, 2, 1],
+        stroke_weights: [2, 1, .9, .8, .7, .6, .5],
         // stroke_weights: [2, 1.5, 1, .5],
         rotation: 90,
         sub_shapes: [1, 2],
-        sub_stroke_weights: [1, 0.5],
+        sub_stroke_weights: [1, .9, .8, .7, .6, 0.5],
     }
 
     generate_image(params);

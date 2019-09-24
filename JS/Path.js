@@ -13,9 +13,11 @@ class Path {
 
         if (path_index == 1)
             this.path = this.spiral(this.grid_x, this.grid_y);
+        else if (path_index == 2)
+            this.path = this.random();
         else
-            this.path = this.default(this.grid_x, this.grid_y);
-        this.linear_path = [].concat(...this.path);
+            this.path = this.default();
+        this.linear_path = this.flatten(this.path);
         this.mapOrigins();
         return this.ordered_origins;
     }
@@ -48,20 +50,6 @@ class Path {
     //============================================================
     // Path Algorithms============================================
     // output: 2D array of index < (grid_x * grid_y)
-    default() {
-        let grid = new Array(this.grid_x)
-            .fill()
-            .map(() => new Array(this.grid_y)
-                .fill(0));
-        let index = 0;
-        for (let i = 0; i < this.grid_x; i++) {
-            for (let j = 0; j < this.grid_y; j++) {
-                grid[i][j] = index;
-                index++
-            }
-        }
-        return grid;
-    }
 
 
     spiral(width, height) {
@@ -120,8 +108,55 @@ class Path {
         return grid
     }
 
+    random() {
+        let grid = this.default();
+        grid = this.flatten(grid);
+        grid = this.shuffle(grid);
+        return this.unflatten(grid);
+    }
 
+    default() {
+        let grid = new Array(this.grid_x)
+            .fill()
+            .map(() => new Array(this.grid_y)
+                .fill(0));
+        let index = 0;
+        for (let i = 0; i < this.grid_x; i++) {
+            for (let j = 0; j < this.grid_y; j++) {
+                grid[i][j] = index;
+                index++
+            }
+        }
 
+        return grid;
+    }
+
+    flatten(ary) {
+        return [].concat(...ary);
+    }
+
+    unflatten(ary) {
+        let grid = new Array(this.grid_x)
+            .fill()
+            .map(() => new Array(this.grid_y)
+                .fill(0));
+        let index = 0;
+        for (let i = 0; i < this.grid_x; i++) {
+            for (let j = 0; j < this.grid_y; j++) {
+                grid[i][j] = ary[index];
+                index++;
+            }
+        }
+        return grid;
+    }
+
+    shuffle(a) {
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
 
 }
 

@@ -8,7 +8,7 @@ class Path {
         this.tile_height = this.paper_height / this.grid_y;
     }
 
-    GeneratePath(path_index) {
+    GeneratePath(path_index, integers = false) {
         this.path;
 
         if (path_index == 1)
@@ -18,8 +18,13 @@ class Path {
         else
             this.path = this.default();
         this.linear_path = this.flatten(this.path);
-        this.mapOrigins();
-        return this.ordered_origins;
+        if (integers) {
+            return this.linear_path
+        }
+        else {
+            this.mapOrigins();
+            return this.ordered_origins;
+        }
     }
 
     //Private

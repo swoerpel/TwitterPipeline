@@ -30,10 +30,10 @@ class MasterController {
             grid_size: Templates.grid_sizes[this.grid_size_index],
             stroke_weights: Templates.stroke_weight_templates[this.step_shape],
             step_path: Templates.step_paths.index,
-            ant_count: 5,
+            ant_count: 4,
             ant_origins_random: false,
-            duration: 100,
-            color_spread: 2,
+            duration: 1000,
+            color_spread: 10,
         }
         // console.log('vital_params.stroke_weights', vital_params.stroke_weights)
         return vital_params;
@@ -135,15 +135,38 @@ class MasterController {
             this.paper_width,
             this.paper_height);
 
-        let step_path = path_machine.GeneratePath(this.vital_params.step_path);
+        let step_path = path_machine.GeneratePath(this.vital_params.step_path, false);
+
+
+        //construction zone=============================================
+        let color_path = path_machine.GeneratePath(0, true)
+        let color_step = 1 / color_path.length
+        let color_origins = color_path.map((c) => { return (c * color_step) });
+
+        let color_magnitude = (ss) => { return ((color_step * 2) / ss) }
+
+        let spread = .25
+
+        console.log('color path', color_path, color_origins)
+        console.log('step path', step_path)
         let origin_index = 0;
         for (let i = 0; i < this.vital_params.grid_size.x; i++) {
             for (let j = 0; j < this.vital_params.grid_size.y; j++) {
                 let origin = step_path[origin_index];
 
-                origin_index++;
+
                 let current_grid = grid[i][j];
-                console.log('current grid color', current_grid.color)
+                let color_sub_step = color_magnitude(current_grid.sub_shape)
+                let tile_colors = []
+                for (let k = 0; k < current_grid.sub_shape; k += color_sub_step) {
+                    // tile_colors.push(1)
+
+                    tile_colors.push((color_origins[origin_index]) +
+                        ((Math.random() > .5) ? -1 : 1) * Math.random() *
+                        spread)
+                }
+                console.log('COLORS', color_origins[origin_index], tile_colors)
+                origin_index++;
                 let grid_values = {
                     origin: origin,
                     width: this.paper_width / this.vital_params.grid_size.x,
@@ -152,7 +175,8 @@ class MasterController {
                     stroke_weight: current_grid.stroke_weight,
                     rotation: current_grid.rotation
                 }
-                let colors = this.SetColors(Templates.ant_attributes.color.style, grid_values.color)
+                let colors = tile_colors
+                // let colors = this.SetColors(Templates.ant_attributes.color.style, grid_values.color)
                 if (this.vital_params.step_shape.name == 'square')
                     DrawSquares(grid_values, colors, this.color_machine);
                 if (this.vital_params.step_shape.name == 'circle')

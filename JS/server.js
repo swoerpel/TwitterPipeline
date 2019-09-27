@@ -139,13 +139,15 @@ else if (mode == 'single') {
         step_path: 2,
         grid_scale: { x: 1, y: 1 },
         grid_size: 2,
-        palette: palettes[Math.floor(Math.random() * palettes.length)],
-        image_id: fake.word(),
-        stroke_weights: [2, 1, .9, .8, .7, .6, .5],
-        // stroke_weights: [2, 1.5, 1, .5],
+        palette: 'blues',//palettes[Math.floor(Math.random() * palettes.length)],
+        // palette: palettes[Math.floor(Math.random() * palettes.length)],
+        image_id: fake.word() + '_' + fake.word(),
+        stroke_weights: [1, .5],
+        // stroke_weights: [1, .95, .9, .85, .8, .75, .7, .65, .6, .55, .5, .45, .4, .35, .3, .25, .2, .15, .1, .05],
         rotation: 90,
-        sub_shapes: [1, 2],
-        sub_stroke_weights: [1, .9, .8, .7, .6, 0.5],
+        sub_shapes: [1, 2, 4],
+        // sub_shapes: [1, 2, 3, 4, 5],
+        sub_stroke_weights: [1, .5],
     }
 
     generate_image(params);

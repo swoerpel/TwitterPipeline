@@ -75,13 +75,14 @@ var grid_sizes = [
     { x: 4 * scale_sizes.x, y: 4 * scale_sizes.y },
     { x: 8 * scale_sizes.x, y: 8 * scale_sizes.y },
     { x: 16 * scale_sizes.x, y: 16 * scale_sizes.y },
+    { x: 32 * scale_sizes.x, y: 32 * scale_sizes.y },
     // { x: 32, y: 32 },
     // { x: 64, y: 64 },
 ]
 
 var png_dims = {
-    x: 2400,
-    y: 2400
+    x: 2400,// * scale_sizes.x,
+    y: 2400// * scale_sizes.y,
 }
 
 var stroke_weight_templates = [

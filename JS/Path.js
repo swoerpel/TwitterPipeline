@@ -50,8 +50,6 @@ class Path {
     //============================================================
     // Path Algorithms============================================
     // output: 2D array of index < (grid_x * grid_y)
-
-
     spiral(width, height) {
         let step_count = 0;
         let max_step_count = width * height;

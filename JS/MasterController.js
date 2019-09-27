@@ -30,10 +30,10 @@ class MasterController {
             grid_size: Templates.grid_sizes[this.grid_size_index],
             stroke_weights: Templates.stroke_weight_templates[this.step_shape],
             step_path: Templates.step_paths.index,
-            ant_count: 20,
-            ant_origins_random: true,
-            duration: 5000,
-            color_spread: 10,
+            ant_count: 5,
+            ant_origins_random: false,
+            duration: 100,
+            color_spread: 2,
         }
         // console.log('vital_params.stroke_weights', vital_params.stroke_weights)
         return vital_params;
@@ -140,8 +140,10 @@ class MasterController {
         for (let i = 0; i < this.vital_params.grid_size.x; i++) {
             for (let j = 0; j < this.vital_params.grid_size.y; j++) {
                 let origin = step_path[origin_index];
+
                 origin_index++;
                 let current_grid = grid[i][j];
+                console.log('current grid color', current_grid.color)
                 let grid_values = {
                     origin: origin,
                     width: this.paper_width / this.vital_params.grid_size.x,
@@ -298,20 +300,22 @@ function DrawTriangles(grid_values, colors, color_machine) {
             // base_triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
             // base_triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
             grid_values.rotation.sort(() => Math.random() - 0.5)
-            grid_values.rotation.map((rot) => {
-                concentric_sub_stroke_weights.map((sw) => {
-                    local_radius = radius * sw
-                    let triangle = new paper.Path();
-                    triangle.strokeWidth = 0
-                    triangle.fillColor = color_machine(Math.random()).hex();
-                    triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y - local_radius));
-                    triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
-                    triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
-                    let color_val = colors[Math.floor(Math.random() * colors.length)]
-                    triangle.fillColor = color_machine(color_val).hex();
-                    triangle.rotate(rot, local_origin)
+            grid_values.rotation.map((rot, index) => {
+                if (index < 20) {
+                    concentric_sub_stroke_weights.map((sw, index) => {
+                        local_radius = radius * sw
+                        let triangle = new paper.Path();
+                        triangle.strokeWidth = 0
+                        triangle.fillColor = color_machine(Math.random()).hex();
+                        triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y - local_radius));
+                        triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
+                        triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
+                        let color_val = colors[Math.floor(Math.random() * colors.length)]
+                        triangle.fillColor = color_machine(color_val).hex();
+                        triangle.rotate(rot, local_origin)
 
-                });
+                    });
+                }
             });
         }
     }

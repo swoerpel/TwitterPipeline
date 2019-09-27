@@ -128,7 +128,6 @@ class Grid {
         let stroke_weight_array = [...this.grid[ant.x][ant.y].stroke_weight];
         if (stroke_weight_array.indexOf(ant.stroke_weight.values[ant.stroke_weight.index]) == -1)
             stroke_weight_array.push(ant.stroke_weight.values[ant.stroke_weight.index])
-
         let rotation_array = [...this.grid[ant.x][ant.y].rotation];
         let value = (Math.round(ant.rotation.value * 100) / 100)
         if (rotation_array.indexOf(value) == -1)
@@ -168,14 +167,14 @@ var goStraight = (ant) => {
 }
 
 var incStepSize = (ant) => {
-    ant.step_size = (ant.step_size + 1) % grid_params.max_step_size
+    ant.step_size = (ant.step_size + 1) % 8
 }
 
 var decStepSize = (ant) => {
     if (ant.step_size != 1)
         ant.step_size--
     else
-        ant.step_size = grid_params.max_step_size
+        ant.step_size = 8
 }
 
 var incStrokeWeight = (ant) => {

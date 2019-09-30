@@ -58,6 +58,7 @@ var generate_image = async (params) => {
     master_controller.SetPaths(params.paths.svg, params.paths.png);
     master_controller.SetStepShape(params.step_shape);
     master_controller.SetStepPath(params.step_path);
+    master_controller.SetColorPath(params.color_path);
     master_controller.SetGridScale(params.grid_scale);
     master_controller.SetGridSize(params.grid_size);
     master_controller.SetImageId(params.image_id);
@@ -129,25 +130,27 @@ if (mode == 'debug') {
 
 }
 else if (mode == 'single') {
-
+    palettes.push(['#fafa6e', '#2A4858'])
     let params = {
         paths: {
             svg: dbg_path_svg,
             png: dbg_path_png,
         },
-        step_shape: 1,
-        step_path: 1,
+        step_shape: 0,
+        step_path: 3, // overlap order path
+        color_path: 1, // color sequence path
         grid_scale: { x: 1, y: 1 },
         grid_size: 3,
+
         palette: 'RdBu',//palettes[Math.floor(Math.random() * palettes.length)],
-        // palette: palettes[Math.floor(Math.random() * palettes.length)],
-        image_id: fake.word() + '_' + fake.word(),
-        stroke_weights: [1, .75, .5],
+        // palette: palettes[palettes.length - 1],
+        image_id: fake.word() + fake.word(),
+        stroke_weights: [2, 1, .5],
         // stroke_weights: [1, .95, .9, .85, .8, .75, .7, .65, .6, .55, .5, .45, .4, .35, .3, .25, .2, .15, .1, .05],
         rotation: 90,
-        sub_shapes: [1, 2],
+        sub_shapes: [1, 2, 4],
         // sub_shapes: [1, 2, 3, 4, 5],
-        sub_stroke_weights: [1, .75],
+        sub_stroke_weights: [1, .5],
     }
 
     generate_image(params);
@@ -163,7 +166,9 @@ else if (mode == 'batch') {
         let index = Math.floor(Math.random() * all_param_combos.length)
         let keys = all_param_combos[index].keys
         let values = all_param_combos[index].values
+
         let palette = palettes[Math.floor(Math.random() * palettes.length)];
+
         generate_image_batch(keys, values, palette);
     }, iteration_time);
 

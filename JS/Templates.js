@@ -76,6 +76,7 @@ var grid_sizes = [
     { x: 8 * scale_sizes.x, y: 8 * scale_sizes.y },
     { x: 16 * scale_sizes.x, y: 16 * scale_sizes.y },
     { x: 32 * scale_sizes.x, y: 32 * scale_sizes.y },
+    { x: 48 * scale_sizes.x, y: 48 * scale_sizes.y },
     // { x: 32, y: 32 },
     // { x: 64, y: 64 },
 ]
@@ -128,6 +129,9 @@ var rotation_attributes = {
 var step_paths = {
     index: 0
 }
+var color_paths = {
+    index: 0
+}
 
 // ARRAY
 var ant_attributes = { //square
@@ -146,3 +150,4 @@ exports.consts = consts;
 exports.png_dims = png_dims;
 exports.scale_sizes = scale_sizes;
 exports.step_paths = step_paths;
+exports.color_paths = color_paths;

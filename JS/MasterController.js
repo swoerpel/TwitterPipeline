@@ -28,9 +28,11 @@ class MasterController {
             },
             rule_template: Templates.rule_templates[this.step_shape],
             grid_size: Templates.grid_sizes[this.grid_size_index],
+            color_rand: .3,
             stroke_weights: Templates.stroke_weight_templates[this.step_shape],
             step_path: Templates.step_paths.index,
-            ant_count: 4,
+            color_path: Templates.color_paths.index,
+            ant_count: 20,
             ant_origins_random: false,
             duration: 1000,
             color_spread: 10,
@@ -87,6 +89,10 @@ class MasterController {
     SetStepPath(step_path) {
         Templates.step_paths.index = step_path;
     }
+    SetColorPath(color_path) {
+        console.log('CP', color_path)
+        Templates.color_paths.index = color_path;
+    }
 
     SetStrokeWeights(weights) {
         Templates.stroke_weight_templates[this.step_shape] = weights;
@@ -139,16 +145,19 @@ class MasterController {
 
 
         //construction zone=============================================
-        let color_path = path_machine.GeneratePath(0, true)
+        let color_path = path_machine.GeneratePath(this.vital_params.color_path, true)
+        // console.log('i love emily laborde', color_path)
+        // color_path = color_path.reverse();
         let color_step = 1 / color_path.length
         let color_origins = color_path.map((c) => { return (c * color_step) });
 
         let color_magnitude = (ss) => { return ((color_step * 2) / ss) }
 
-        let spread = .25
 
-        console.log('color path', color_path, color_origins)
-        console.log('step path', step_path)
+        // let spread = 0.2
+
+        // console.log('color path', color_path, color_origins)
+        // console.log('step path', step_path)
         let origin_index = 0;
         for (let i = 0; i < this.vital_params.grid_size.x; i++) {
             for (let j = 0; j < this.vital_params.grid_size.y; j++) {
@@ -163,9 +172,8 @@ class MasterController {
 
                     tile_colors.push((color_origins[origin_index]) +
                         ((Math.random() > .5) ? -1 : 1) * Math.random() *
-                        spread)
+                        this.vital_params.color_rand)
                 }
-                console.log('COLORS', color_origins[origin_index], tile_colors)
                 origin_index++;
                 let grid_values = {
                     origin: origin,
@@ -175,7 +183,7 @@ class MasterController {
                     stroke_weight: current_grid.stroke_weight,
                     rotation: current_grid.rotation
                 }
-                let colors = tile_colors
+                let colors = tile_colors.reverse()
                 // let colors = this.SetColors(Templates.ant_attributes.color.style, grid_values.color)
                 if (this.vital_params.step_shape.name == 'square')
                     DrawSquares(grid_values, colors, this.color_machine);
@@ -325,21 +333,21 @@ function DrawTriangles(grid_values, colors, color_machine) {
             // base_triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
             grid_values.rotation.sort(() => Math.random() - 0.5)
             grid_values.rotation.map((rot, index) => {
-                if (index < 20) {
-                    concentric_sub_stroke_weights.map((sw, index) => {
-                        local_radius = radius * sw
-                        let triangle = new paper.Path();
-                        triangle.strokeWidth = 0
-                        triangle.fillColor = color_machine(Math.random()).hex();
-                        triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y - local_radius));
-                        triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
-                        triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
-                        let color_val = colors[Math.floor(Math.random() * colors.length)]
-                        triangle.fillColor = color_machine(color_val).hex();
-                        triangle.rotate(rot, local_origin)
+                // if (index < 100) {
+                concentric_sub_stroke_weights.map((sw, index) => {
+                    local_radius = radius * sw
+                    let triangle = new paper.Path();
+                    triangle.strokeWidth = 0
+                    triangle.fillColor = color_machine(Math.random()).hex();
+                    triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y - local_radius));
+                    triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
+                    triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
+                    let color_val = colors[Math.floor(Math.random() * colors.length)]
+                    triangle.fillColor = color_machine(color_val).hex();
+                    triangle.rotate(rot, local_origin)
 
-                    });
-                }
+                });
+                // }
             });
         }
     }

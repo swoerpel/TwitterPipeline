@@ -15,6 +15,8 @@ class Path {
             this.path = this.spiral(this.grid_x, this.grid_y);
         else if (path_index == 2)
             this.path = this.random();
+        else if (path_index == 3)
+            this.path = this.crisscross();
         else
             this.path = this.default();
         this.linear_path = this.flatten(this.path);
@@ -55,6 +57,25 @@ class Path {
     //============================================================
     // Path Algorithms============================================
     // output: 2D array of index < (grid_x * grid_y)
+
+    crisscross() {
+        let grid = this.default();
+        let new_grid = []
+        for (let i = 0; i < grid.length; i++) {
+            console.log('row', i, grid[i])
+            console.log('rev', i, grid[i].reverse())
+            if (i % 2 == 0) {
+                new_grid.push(grid[i].reverse())
+            }
+            else {
+                new_grid.push(grid[i])
+            }
+        }
+        // grid = grid.map((row, index) => { return (index % 2 == 0 ? row.reverse() : row) })
+        console.log('color path grid', new_grid)
+        return new_grid;
+    }
+
     spiral(width, height) {
         let step_count = 0;
         let max_step_count = width * height;

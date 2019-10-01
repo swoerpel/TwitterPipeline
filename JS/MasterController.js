@@ -28,7 +28,7 @@ class MasterController {
             },
             rule_template: Templates.rule_templates[this.step_shape],
             grid_size: Templates.grid_sizes[this.grid_size_index],
-            color_rand: .3,
+            color_rand: 0.3,
             stroke_weights: Templates.stroke_weight_templates[this.step_shape],
             step_path: Templates.step_paths.index,
             color_path: Templates.color_paths.index,

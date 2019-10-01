@@ -31,10 +31,15 @@ let svg_path = "C:\\Files\\Art\\Tweets\\SVG\\"
 let png_path = "C:\\Files\\Art\\Tweets\\PNG\\"
 let combined_png_path = "C:\\Files\\Art\\Tweets\\CPNG\\"
 let png_posted_path = "C:\\Files\\Art\\Tweets\\Posted\\"
-let dbg_path_png = "C:\\Files\\Art\\Tweets\\Debug\\"
-let dbg_path_svg = "C:\\Files\\Art\\Tweets\\Debug\\"
+let dbg_path_png = "G:\\TwitterPipeline\\Debug\\"
+// let dbg_path_png = "C:\\Files\\Art\\Tweets\\Debug\\"
+let dbg_path_svg = "G:\\TwitterPipeline\\Debug\\"
+// let dbg_path_svg = "C:\\Files\\Art\\Tweets\\Debug\\"
 let chet_svg_path = "G:\\TwitterPipeline\\all_params_images\\SVG\\"
 let chet_png_path = "G:\\TwitterPipeline\\all_params_images\\PNG\\"
+
+let layer_masks_path = "G:\\TwitterPipeline\\Layered\\Masks\\"
+let layer_images_path = "G:\\TwitterPipeline\\Layered\\Layers\\"
 let python_scripts = {
     LayerImages: 'C:\\Files\\Programming\\TwitterPipeline\\Python\\LayerImages.py',
 }
@@ -130,19 +135,19 @@ if (mode == 'debug') {
 
 }
 else if (mode == 'single') {
-    palettes.push(['#fafa6e', '#2A4858'])
+    palettes.push(['yellow', 'orange', 'red'])
     let params = {
         paths: {
             svg: dbg_path_svg,
             png: dbg_path_png,
         },
-        step_shape: 0,
+        step_shape: 2,
         step_path: 3, // overlap order path
-        color_path: 1, // color sequence path
+        color_path: 4, // color sequence path
         grid_scale: { x: 1, y: 1 },
-        grid_size: 3,
+        grid_size: 2,
 
-        palette: 'RdBu',//palettes[Math.floor(Math.random() * palettes.length)],
+        palette: 'Spectral',//palettes[Math.floor(Math.random() * palettes.length)],
         // palette: palettes[palettes.length - 1],
         image_id: fake.word() + fake.word(),
         stroke_weights: [2, 1, .5],
@@ -150,7 +155,7 @@ else if (mode == 'single') {
         rotation: 90,
         sub_shapes: [1, 2, 4],
         // sub_shapes: [1, 2, 3, 4, 5],
-        sub_stroke_weights: [1, .5],
+        sub_stroke_weights: [1],
     }
 
     generate_image(params);

@@ -17,6 +17,8 @@ class Path {
             this.path = this.random();
         else if (path_index == 3)
             this.path = this.crisscross();
+        else if (path_index == 4)
+            this.path = this.divider();
         else
             this.path = this.default();
         this.linear_path = this.flatten(this.path);
@@ -57,6 +59,38 @@ class Path {
     //============================================================
     // Path Algorithms============================================
     // output: 2D array of index < (grid_x * grid_y)
+
+    divider() {
+        let grid = this.default();
+        // console.log('GRID', grid)
+        let new_grid = []
+        let max = this.grid_x * this.grid_y - 1
+        let count = 0;
+        for (let i = 0; i < grid.length; i++) {
+            let row = []
+            for (let j = 0; j < grid[0].length; j++) {
+                if (count % 2 == 0) {
+                    row.push(count)
+                }
+                else {
+                    row.push(max - count)
+                }
+                count++;
+                // console.log('row', i, grid[i])
+                // console.log('rev', i, grid[i].reverse())
+                // if (i % 2 == 0) {
+                //     new_grid.push(grid[i].reverse())
+                // }
+                // else {
+                //     new_grid.push(grid[i])
+                // }
+            }
+            new_grid.push(row)
+        }
+        // grid = grid.map((row, index) => { return (index % 2 == 0 ? row.reverse() : row) })
+        console.log('color path grid', new_grid)
+        return new_grid;
+    }
 
     crisscross() {
         let grid = this.default();

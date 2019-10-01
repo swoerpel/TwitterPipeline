@@ -35,6 +35,8 @@ var chet_colors = {
         "#002a33"],
 }
 
+
+
 const { spawn } = require('child_process')
 
 var T1 = new schedule.RecurrenceRule();
@@ -116,6 +118,8 @@ let mode = 'debug';
 // let mode = 'single';
 // let mode = 'batch';
 
+let mask_mode = true;
+// let mask_mode = false;
 
 
 if (mode == 'debug') {
@@ -123,6 +127,20 @@ if (mode == 'debug') {
     function runScript() {
         console.log('layer mask paths', layer_masks_paths)
         let composite_name = fake.word() + fake.word() + fake.word() + '.png'
+        let layer_params = {
+            top_shape: 'circles',
+            bottom_shape: 'triangles',
+            mask_type: 'triangles',
+        }
+        // let layer_params = {
+        //     top_shape: 1,
+        //     bottom_shape: 2,
+        //     mask_type: 2,
+        // }
+        let color_params = {
+            top: 'spectral',
+            bottom: 'greys'
+        }
         return spawn('python', [
             "-u",
             python_scripts.LayerImages,
@@ -130,6 +148,8 @@ if (mode == 'debug') {
             layer_images_path,
             layer_composites_path,
             composite_name,
+            JSON.stringify(layer_params),
+            JSON.stringify(color_params)
         ]);
     }
     const subprocess = runScript()
@@ -175,24 +195,28 @@ else if (mode == 'batch') {
     let index = 0;
     let J5 = setInterval(() => {
         let palette = palettes[Math.floor(Math.random() * palettes.length)]
-
-
+        let step_path = Math.floor(Math.random() * 4)
+        let color_path = Math.floor(Math.random() * 4)
         for (let i = 0; i < 3; i++) {
             for (let j = 1; j < 2; j++) {
 
+                let stroke_weights = [1, .5]
+                if (i != 1) { // triangles overlap better
+                    stroke_weights = [2, 1, .75, .5]
+                }
                 let params = {
                     paths: {
                         svg: dbg_path_svg,
                         png: layer_images_path,
                     },
                     step_shape: i,
-                    step_path: 2, // overlap order path
-                    color_path: 3, // color sequence path
+                    step_path: step_path, // overlap order path
+                    color_path: color_path, // color sequence path
                     grid_scale: { x: 1, y: 1 },
                     grid_size: j,
                     palette: palette,
-                    image_id: 'SHAPE-' + i.toString() + '_GRID-' + j.toString() + '_' + palette,
-                    stroke_weights: [1, .5],
+                    image_id: 'SHAPE-' + i.toString() + '_GRID-' + j.toString() + '_' + palette + '_' + Math.round(Math.random() * 100).toString(),
+                    stroke_weights: stroke_weights,
                     rotation: 90,
                     sub_shapes: [1, 2, 4],
                     sub_stroke_weights: [1],

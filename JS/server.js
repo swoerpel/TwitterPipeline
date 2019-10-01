@@ -8,6 +8,33 @@ var fs = require('fs'),
     mask = require('./MaskGenerator.js'),
     schedule = require('node-schedule'),
     config = require('./config.js');
+
+var chet_colors = {
+
+
+    Diamond: ["#87afa1",
+        "#53eca6",
+        "#576f6a",
+        "#68e7d7",
+        "#346d5a",
+        "#b5e4d0",
+        "#289365",
+        "#4fb2a5",
+        "#57c897",
+        "#539178"],
+
+    DarkOcean: ["#295666",
+        "#002a33",
+        "#387390",
+        "#002a33",
+        "#143b44",
+        "#002a33",
+        "#002a33",
+        "#002a33",
+        "#002a33",
+        "#002a33"],
+}
+
 const { spawn } = require('child_process')
 
 var T1 = new schedule.RecurrenceRule();
@@ -38,7 +65,17 @@ let dbg_path_svg = "G:\\TwitterPipeline\\Debug\\"
 let chet_svg_path = "G:\\TwitterPipeline\\all_params_images\\SVG\\"
 let chet_png_path = "G:\\TwitterPipeline\\all_params_images\\PNG\\"
 
-let layer_masks_path = "G:\\TwitterPipeline\\Layered\\Masks\\"
+
+
+let layer_masks_paths = {
+    squares: "G:\\TwitterPipeline\\Layered\\Masks\\Squares\\",
+    circles: "G:\\TwitterPipeline\\Layered\\Masks\\Circles\\",
+    triangles: "G:\\TwitterPipeline\\Layered\\Masks\\Triangles\\",
+    custom: "G:\\TwitterPipeline\\Layered\\Masks\\Custom\\",
+    letters: "G:\\TwitterPipeline\\Layered\\Masks\\Letters\\",
+}
+
+// let layer_images_path = "G:\\TwitterPipeline\\Layered\\Layers\\"
 let layer_images_path = "G:\\TwitterPipeline\\Layered\\Layers\\"
 let layer_composites_path = "G:\\TwitterPipeline\\Layered\\Composites\\"
 let python_scripts = {
@@ -76,55 +113,23 @@ var generate_image = async (params) => {
 }
 
 let mode = 'debug';
+// let mode = 'single';
+// let mode = 'batch';
 
 
 
 if (mode == 'debug') {
 
-    // var generate_image = async (step_shape, image_id, grid_size) => {
-
-    //     let color_machine = chroma.scale(palette)
-    //     // let image_id = fake.word();
-    //     let master_controller = new MasterController();
-    //     master_controller.SetPaths(svg_path, png_path);
-    //     master_controller.SetStepShape(step_shape);
-    //     master_controller.SetGridSize(grid_size);
-    //     master_controller.SetImageId(image_id);
-    //     master_controller.SetStrokeWeights([1, .9, .8, .7, .6, .5]);
-    //     master_controller.SetRotation(90);
-    //     master_controller.SetSubShapes([1, 2]);
-    //     master_controller.SetSubStrokeWeights([1, .5]);
-    //     master_controller.GenerateImage(color_machine);
-    // }
-    // let palette = palettes[Math.floor(Math.random() * palettes.length)];
-    // let fake_word = fake.word();
-    // let id1 = fake_word + '0'
-    // let id2 = fake_word + '1'
-    // let id3 = fake_word + '2'
-    // generate_image(2, id1, 0, palette);
-    // generate_image(2, id2, 1, palette);
-    // generate_image(2, id3, 2, palette);
-    // let MG = new mask.MaskGenerator(png_path)
-    // let mask1_path = 'm1' + id1
-    // MG.GenerateMask({ width: 400, height: 400 }, 0, mask1_path)
-    // // python script testing
-    // let image_paths = [
-    //     png_path + id1,
-    //     png_path + id2,
-    //     png_path + id3,
-    // ]
-
-    // populate masks
-    // generate mask selection ID
-
-
     function runScript() {
+        console.log('layer mask paths', layer_masks_paths)
+        let composite_name = fake.word() + fake.word() + fake.word() + '.png'
         return spawn('python', [
             "-u",
             python_scripts.LayerImages,
-            layer_masks_path,
+            JSON.stringify(layer_masks_paths),
             layer_images_path,
             layer_composites_path,
+            composite_name,
         ]);
     }
     const subprocess = runScript()
@@ -142,47 +147,74 @@ if (mode == 'debug') {
 
 }
 else if (mode == 'single') {
-    palettes.push(['yellow', 'orange', 'red'])
     let params = {
         paths: {
             svg: dbg_path_svg,
-            png: layer_images_path,
+            png: dbg_path_png,
         },
-        step_shape: 0,
-        step_path: 0, // overlap order path
+        step_shape: 2,
+        step_path: 2, // overlap order path
         color_path: 3, // color sequence path
         grid_scale: { x: 1, y: 1 },
-        grid_size: 2,
-
-        palette: 'Blues',//palettes[Math.floor(Math.random() * palettes.length)],
-        // palette: palettes[palettes.length - 1],
+        grid_size: 1,
+        // palette: palettes[Math.floor(Math.random() * palettes.length)],
+        palette: chet_colors.ice_cube,
         image_id: fake.word() + fake.word(),
-        stroke_weights: [1],
-        // stroke_weights: [1, .95, .9, .85, .8, .75, .7, .65, .6, .55, .5, .45, .4, .35, .3, .25, .2, .15, .1, .05],
+        stroke_weights: [1, .5],
         rotation: 90,
         sub_shapes: [1, 2, 4],
-        // sub_shapes: [1, 2, 3, 4, 5],
         sub_stroke_weights: [1],
     }
-
     generate_image(params);
-
 }
 else if (mode == 'batch') {
-    let iteration_time = .5; //minutes
+    let iteration_time = .25; //minutes
     iteration_time *= 60; //seconds
     iteration_time *= 1000; //miliseconds
-    let PC = new ParameterController();
-    let all_param_combos = PC.GenerateParams();
+
+    let index = 0;
     let J5 = setInterval(() => {
-        let index = Math.floor(Math.random() * all_param_combos.length)
-        let keys = all_param_combos[index].keys
-        let values = all_param_combos[index].values
+        let palette = palettes[Math.floor(Math.random() * palettes.length)]
 
-        let palette = palettes[Math.floor(Math.random() * palettes.length)];
 
-        generate_image_batch(keys, values, palette);
+        for (let i = 0; i < 3; i++) {
+            for (let j = 1; j < 2; j++) {
+
+                let params = {
+                    paths: {
+                        svg: dbg_path_svg,
+                        png: layer_images_path,
+                    },
+                    step_shape: i,
+                    step_path: 2, // overlap order path
+                    color_path: 3, // color sequence path
+                    grid_scale: { x: 1, y: 1 },
+                    grid_size: j,
+                    palette: palette,
+                    image_id: 'SHAPE-' + i.toString() + '_GRID-' + j.toString() + '_' + palette,
+                    stroke_weights: [1, .5],
+                    rotation: 90,
+                    sub_shapes: [1, 2, 4],
+                    sub_stroke_weights: [1],
+
+                }
+
+                generate_image(params);
+            }
+        }
+
     }, iteration_time);
+    // let PC = new ParameterController();
+    // let all_param_combos = PC.GenerateParams();
+    // let J5 = setInterval(() => {
+    //     let index = Math.floor(Math.random() * all_param_combos.length)
+    //     let keys = all_param_combos[index].keys
+    //     let values = all_param_combos[index].values
+
+    //     let palette = palettes[Math.floor(Math.random() * palettes.length)];
+
+    //     generate_image_batch(keys, values, palette);
+    // }, iteration_time);
 
 }
 else if (mode == 'twitter') {

@@ -1,71 +1,92 @@
 import sys
+import numpy
+import json
 from PIL import Image, ImageDraw
 from os import listdir
 from os.path import isfile, join
 
 
 def main(argv):
-    mask_source = argv[0]
-    images_source = argv[1]
+    mask_sources = json.loads(argv[0])
+    image_source = argv[1]
     composite_dest = argv[2]
-    print('image source and dest', mask_source, images_source)
-    image_names = [f for f in listdir(images_source)
-                   if isfile(join(images_source, f))]
-    print('files in source', image_names)
-    im1 = Image.open(images_source + image_names[0])  # .convert('L')
-    im2 = Image.open(images_source + image_names[1])  # .convert('L')
-    mask = Image.open(mask_source + 'm1.png').convert('L')
-    print('im1 im2 mask', im1, im2, mask)
-    composite = Image.composite(im1, im2, mask)
-    composite_image_name = image_names[0] + '-' + image_names[1] + '-m1.png'
-    composite.save(composite_dest+composite_image_name)
-    # mask = Image.new('L', im1.size, color=255)
-    # draw = ImageDraw.Draw(mask)
-    # draw.rectangle(transparent_area, fill=0)
-    # im1.putalpha(mask)
-    # dst = Image.new('RGB', (im1.width, im1.height))
-    # dst.paste(im2, (0, 0))
-    # dst.paste(im1, (0, 0))
-    # dst.save(image_dest + '/output.png')
-    # final2 = Image.new("RGBA", im1.size)
-    # final2 = Image.alpha_composite(final2, im1)
-    # final2 = Image.alpha_composite(im1, im2)
-    # final2.save(image_dest + '/output.png')
+    composite_name = argv[3]
+    image_params = FilterImages(image_source)
+
+    top_shape = 'circles'
+    bottom_shape = 'triangles'
+    mask_type = 'triangles'
+
+    top_palette = 'gnbu'
+    bottom_palette = 'YlOrRd'
+
+    top_im = GetImage(
+        image_params[top_shape],
+        top_palette,
+        image_source)
+    bottom_im = GetImage(
+        image_params[bottom_shape],
+        bottom_palette,
+        image_source)
+    mask = GetMask(mask_sources[mask_type])
+    print('MASK', mask, top_im, bottom_im)
+    composite = Image.composite(top_im, bottom_im, mask)
+    composite.save(composite_dest+composite_name)
+
+
+def GetImage(image_params, palette, path):
+    for i in image_params:
+        if i['palette'] == palette:
+            params = i
+    image_name = "SHAPE-"
+    image_name += str(params['step_shape'])
+    image_name += "_GRID-"
+    image_name += str(params['grid_size'])
+    image_name += "_"
+    image_name += params['palette']
+    image_name += ".png"
+    print('image name', image_name)
+    return Image.open(path + image_name)
+
+
+def GetMask(path):
+    image_names = [f for f in listdir(path)
+                   if isfile(join(path, f))]
+    print('get mask', image_names)
+    rand_im = numpy.random.randint(0, len(image_names))
+    return Image.open(path + image_names[rand_im]).convert('L')
+
+
+def FilterImages(path):
+    image_names = [f for f in listdir(path)
+                   if isfile(join(path, f))]
+    image_params = []
+    for i in image_names:
+        values = i.split('_')
+        param = {
+            'step_shape': int(values[0].split('-')[1]),
+            'grid_size': int(values[1].split('-')[1]),
+            'palette': values[2].split('.')[0]
+        }
+        image_params.append(param)
+    squares = []
+    circles = []
+    triangles = []
+    for i in image_params:
+        if i['step_shape'] == 0:
+            squares.append(i)
+        elif i['step_shape'] == 1:
+            circles.append(i)
+        elif i['step_shape'] == 2:
+            triangles.append(i)
+        else:
+            print('step shape out of range (FilterImages)')
+    return {
+        'squares': squares,
+        'circles': circles,
+        'triangles': triangles
+    }
 
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-
-# import sys
-# import json
-# import numpy as np
-
-# # Read data from stdin
-
-
-# def read_in():
-#     lines = sys.stdin.readlines()
-#     print('lines', lines)
-#     # Since our input would only be having one line, parse our JSON data from that
-#     return json.loads(lines[0])
-#     # return json.loads(lines[0])
-
-
-# def main():
-#     # get our data as an array from read_in()
-#     lines = read_in()
-
-#     # print(sys.argv[0], 'inside of applymask')
-#     # create a numpy array
-#     np_lines = np.array(lines)
-
-#     # use numpys sum method to find sum of all elements in the array
-#     lines_sum = np.sum(np_lines)
-#     # lines_sum = sys.argv[0] + 'dave'
-#     # return the sum to the output stream
-#     print lines_sum
-
-
-# # start process
-# if __name__ == '__main__':
-#     main()

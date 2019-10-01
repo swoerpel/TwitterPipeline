@@ -40,6 +40,7 @@ let chet_png_path = "G:\\TwitterPipeline\\all_params_images\\PNG\\"
 
 let layer_masks_path = "G:\\TwitterPipeline\\Layered\\Masks\\"
 let layer_images_path = "G:\\TwitterPipeline\\Layered\\Layers\\"
+let layer_composites_path = "G:\\TwitterPipeline\\Layered\\Composites\\"
 let python_scripts = {
     LayerImages: 'C:\\Files\\Programming\\TwitterPipeline\\Python\\LayerImages.py',
 }
@@ -74,7 +75,7 @@ var generate_image = async (params) => {
     master_controller.GenerateImage(color_machine);
 }
 
-let mode = 'single';
+let mode = 'debug';
 
 
 
@@ -103,34 +104,40 @@ if (mode == 'debug') {
     // generate_image(2, id1, 0, palette);
     // generate_image(2, id2, 1, palette);
     // generate_image(2, id3, 2, palette);
-    let MG = new mask.MaskGenerator(png_path)
+    // let MG = new mask.MaskGenerator(png_path)
     // let mask1_path = 'm1' + id1
     // MG.GenerateMask({ width: 400, height: 400 }, 0, mask1_path)
-    MG.GenerateParade();
     // // python script testing
     // let image_paths = [
     //     png_path + id1,
     //     png_path + id2,
     //     png_path + id3,
     // ]
-    // function runScript() {
-    //     return spawn('python', [
-    //         "-u",
-    //         python_scripts.LayerImages,
-    //         image_paths, combined_png_path,
-    //     ]);
-    // }
-    // const subprocess = runScript()
 
-    // subprocess.stdout.on('data', (data) => {
-    //     console.log(`data:${data}`);
-    // });
-    // subprocess.stderr.on('data', (data) => {
-    //     console.log(`error:${data}`);
-    // });
-    // subprocess.stderr.on('close', () => {
-    //     console.log("Closed");
-    // });
+    // populate masks
+    // generate mask selection ID
+
+
+    function runScript() {
+        return spawn('python', [
+            "-u",
+            python_scripts.LayerImages,
+            layer_masks_path,
+            layer_images_path,
+            layer_composites_path,
+        ]);
+    }
+    const subprocess = runScript()
+
+    subprocess.stdout.on('data', (data) => {
+        console.log(`data:${data}`);
+    });
+    subprocess.stderr.on('data', (data) => {
+        console.log(`error:${data}`);
+    });
+    subprocess.stderr.on('close', () => {
+        console.log("Closed");
+    });
 
 
 }
@@ -139,18 +146,18 @@ else if (mode == 'single') {
     let params = {
         paths: {
             svg: dbg_path_svg,
-            png: dbg_path_png,
+            png: layer_images_path,
         },
-        step_shape: 2,
-        step_path: 3, // overlap order path
-        color_path: 4, // color sequence path
+        step_shape: 0,
+        step_path: 0, // overlap order path
+        color_path: 3, // color sequence path
         grid_scale: { x: 1, y: 1 },
         grid_size: 2,
 
-        palette: 'Spectral',//palettes[Math.floor(Math.random() * palettes.length)],
+        palette: 'Blues',//palettes[Math.floor(Math.random() * palettes.length)],
         // palette: palettes[palettes.length - 1],
         image_id: fake.word() + fake.word(),
-        stroke_weights: [2, 1, .5],
+        stroke_weights: [1],
         // stroke_weights: [1, .95, .9, .85, .8, .75, .7, .65, .6, .55, .5, .45, .4, .35, .3, .25, .2, .15, .1, .05],
         rotation: 90,
         sub_shapes: [1, 2, 4],

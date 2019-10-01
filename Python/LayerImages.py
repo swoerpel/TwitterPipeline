@@ -5,16 +5,20 @@ from os.path import isfile, join
 
 
 def main(argv):
-    image_sources = argv[0]
-    image_dest = argv[1]
-    print('image source and dest', image_source, image_dest)
-    images = [f for f in listdir(image_source)
-              if isfile(join(image_source, f))]
-    print('files in source', images)
-    # im1 = Image.open(image_source + images[0])
-    # im2 = Image.open(image_source + images[1])
-    # transparent_area = (0, 0, im1.size[0]/2, im1.size[0])
-    # print('image size', im1, im2)
+    mask_source = argv[0]
+    images_source = argv[1]
+    composite_dest = argv[2]
+    print('image source and dest', mask_source, images_source)
+    image_names = [f for f in listdir(images_source)
+                   if isfile(join(images_source, f))]
+    print('files in source', image_names)
+    im1 = Image.open(images_source + image_names[0])  # .convert('L')
+    im2 = Image.open(images_source + image_names[1])  # .convert('L')
+    mask = Image.open(mask_source + 'm1.png').convert('L')
+    print('im1 im2 mask', im1, im2, mask)
+    composite = Image.composite(im1, im2, mask)
+    composite_image_name = image_names[0] + '-' + image_names[1] + '-m1.png'
+    composite.save(composite_dest+composite_image_name)
     # mask = Image.new('L', im1.size, color=255)
     # draw = ImageDraw.Draw(mask)
     # draw.rectangle(transparent_area, fill=0)

@@ -15,8 +15,7 @@ def main(argv):
     layer_params = json.loads(argv[4])  # new
     color_params = json.loads(argv[5])  # new
     image_params = FilterImages(image_source)
-    # print('IMAGE PARAMS',
-    # image_params, layer_params['top_shape'])
+    print('Layer Params', layer_params)
     top_im = GetImage(
         image_params[layer_params['top_shape']],
         color_params['top'],
@@ -32,10 +31,13 @@ def main(argv):
 
 
 def GetImage(image_params, palette, path):
+    image_options = []
     for i in image_params:
         if i['palette'] == palette:
             params = i
-
+            image_options.append(i)
+    params = image_options[random.randint(0, 1)]
+    print('IMAGE OPTIONS', image_options, params)
     image_name = "SHAPE-"
     image_name += str(params['step_shape'])
     image_name += "_GRID-"
@@ -51,7 +53,6 @@ def GetImage(image_params, palette, path):
 def GetMask(path):
     image_names = [f for f in listdir(path)
                    if isfile(join(path, f))]
-    print('get mask', image_names)
     rand_im = numpy.random.randint(0, len(image_names))
     return Image.open(path + image_names[rand_im]).convert('L')
 
@@ -89,9 +90,9 @@ def FilterImages(path):
     random.shuffle(circles)
     random.shuffle(triangles)
     return {
-        'squares': squares,
-        'circles': circles,
-        'triangles': triangles
+        0: squares,
+        1: circles,
+        2: triangles
     }
 
 

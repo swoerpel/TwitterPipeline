@@ -128,18 +128,15 @@ if (mode == 'debug') {
         console.log('layer mask paths', layer_masks_paths)
         let composite_name = fake.word() + fake.word() + fake.word() + '.png'
         let layer_params = {
-            top_shape: 'circles',
-            bottom_shape: 'triangles',
-            mask_type: 'triangles',
+            top_shape: 2,
+            bottom_shape: 2,
+            mask_type: 'circles',
         }
-        // let layer_params = {
-        //     top_shape: 1,
-        //     bottom_shape: 2,
-        //     mask_type: 2,
-        // }
         let color_params = {
-            top: 'spectral',
-            bottom: 'greys'
+            top: palettes[Math.floor(Math.random() * palettes.length)],
+            bottom: palettes[Math.floor(Math.random() * palettes.length)],
+            // top: 'Greys',
+            // bottom: 'RdBu'
         }
         return spawn('python', [
             "-u",
@@ -153,6 +150,11 @@ if (mode == 'debug') {
         ]);
     }
     const subprocess = runScript()
+    // runScript()
+    // runScript()
+    // runScript()
+    // runScript()
+
 
     subprocess.stdout.on('data', (data) => {
         console.log(`data:${data}`);
@@ -198,9 +200,9 @@ else if (mode == 'batch') {
         let step_path = Math.floor(Math.random() * 4)
         let color_path = Math.floor(Math.random() * 4)
         for (let i = 0; i < 3; i++) {
-            for (let j = 1; j < 2; j++) {
+            for (let j = 0; j < 2; j++) {
 
-                let stroke_weights = [1, .5]
+                let stroke_weights = [1, .9, .8, .7, .6, .5]
                 if (i != 1) { // triangles overlap better
                     stroke_weights = [2, 1, .75, .5]
                 }
@@ -218,11 +220,9 @@ else if (mode == 'batch') {
                     image_id: 'SHAPE-' + i.toString() + '_GRID-' + j.toString() + '_' + palette + '_' + Math.round(Math.random() * 100).toString(),
                     stroke_weights: stroke_weights,
                     rotation: 90,
-                    sub_shapes: [1, 2, 4],
-                    sub_stroke_weights: [1],
-
+                    sub_shapes: [1, 2],
+                    sub_stroke_weights: [1, .5],
                 }
-
                 generate_image(params);
             }
         }

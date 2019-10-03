@@ -14,29 +14,40 @@ def main(argv):
     composite_name = argv[3]
     layer_params = json.loads(argv[4])  # new
     color_params = json.loads(argv[5])  # new
-    image_params = FilterImages(image_source)
+    mask_params = json.loads(argv[6])  # new
+    all_image_params = FilterImages(image_source)
     print('Layer Params', layer_params)
+
+    top_step_shape = layer_params['top_step_shape']
+    bottom_step_shape = layer_params['bottom_step_shape']
+
     top_im = GetImage(
-        image_params[layer_params['top_shape']],
-        color_params['top'],
+        all_image_params[top_step_shape],
+        layer_params['top_grid_size'],
+        color_params['top_image'],
         image_source)
+
     bottom_im = GetImage(
-        image_params[layer_params['bottom_shape']],
-        color_params['bottom'],
+        all_image_params[bottom_step_shape],
+        layer_params['bottom_grid_size'],
+        color_params['bottom_image'],
         image_source)
-    mask = GetMask(mask_sources[layer_params['mask_type']])
+
+    mask = GetMask(
+        mask_sources[mask_params['mask_type']],
+        mask_params['mask_name'])
+
     print('Composite Image ->', composite_name)
     composite = Image.composite(top_im, bottom_im, mask)
     composite.save(composite_dest+composite_name)
 
 
-def GetImage(image_params, palette, path):
+def GetImage(image_param_group, grid_size, palette, path):
     image_options = []
-    for i in image_params:
-        if i['palette'] == palette:
-            params = i
+    for i in image_param_group:
+        if i['palette'] == palette and i['grid_size'] == grid_size:
             image_options.append(i)
-    params = image_options[random.randint(0, 1)]
+    params = image_options[random.randint(0, len(image_options) - 1)]
     print('IMAGE OPTIONS', image_options, params)
     image_name = "SHAPE-"
     image_name += str(params['step_shape'])
@@ -50,11 +61,21 @@ def GetImage(image_params, palette, path):
     return Image.open(path + image_name)
 
 
-def GetMask(path):
-    image_names = [f for f in listdir(path)
-                   if isfile(join(path, f))]
-    rand_im = numpy.random.randint(0, len(image_names))
-    return Image.open(path + image_names[rand_im]).convert('L')
+def FilterBy(array, key, value):
+    filtered = []
+    for i in array:
+        print(i, 'CHEZZZZZ')
+    return array
+
+
+def GetMask(path, name=''):
+    if(name == ''):
+        mask_names = [f for f in listdir(path)
+                      if isfile(join(path, f))]
+        rand_im = numpy.random.randint(0, len(mask_names))
+        return Image.open(path + mask_names[rand_im]).convert('L')
+    else:
+        return Image.open(path + name + '.png').convert('L')
 
 
 def FilterImages(path):

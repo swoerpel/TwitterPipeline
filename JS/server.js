@@ -128,16 +128,24 @@ if (mode == 'debug') {
         console.log('layer mask paths', layer_masks_paths)
         let composite_name = fake.word() + fake.word() + fake.word() + '.png'
         let layer_params = {
-            top_shape: 2,
-            bottom_shape: 2,
-            mask_type: 'circles',
+            top_step_shape: 1,
+            bottom_step_shape: 1,
+            top_grid_size: 1,
+            bottom_grid_size: 1,
         }
+
         let color_params = {
-            top: palettes[Math.floor(Math.random() * palettes.length)],
-            bottom: palettes[Math.floor(Math.random() * palettes.length)],
-            // top: 'Greys',
-            // bottom: 'RdBu'
+            top_image: palettes[Math.floor(Math.random() * palettes.length)],
+            bottom_image: palettes[Math.floor(Math.random() * palettes.length)],
+            // top: 'set1',
+            // bottom: 'set1'
         }
+
+        let mask_params = {
+            mask_type: 'squares',
+            mask_name: ''
+        }
+
         return spawn('python', [
             "-u",
             python_scripts.LayerImages,
@@ -146,7 +154,8 @@ if (mode == 'debug') {
             layer_composites_path,
             composite_name,
             JSON.stringify(layer_params),
-            JSON.stringify(color_params)
+            JSON.stringify(color_params),
+            JSON.stringify(mask_params),
         ]);
     }
     const subprocess = runScript()

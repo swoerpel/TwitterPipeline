@@ -75,6 +75,7 @@ let layer_masks_paths = {
     triangles: "G:\\TwitterPipeline\\Layered\\Masks\\Triangles\\",
     custom: "G:\\TwitterPipeline\\Layered\\Masks\\Custom\\",
     letters: "G:\\TwitterPipeline\\Layered\\Masks\\Letters\\",
+    full: "G:\\TwitterPipeline\\Layered\\Masks\\Full\\",
 }
 
 // let layer_images_path = "G:\\TwitterPipeline\\Layered\\Layers\\"
@@ -114,8 +115,8 @@ var generate_image = async (params) => {
     master_controller.GenerateImage(color_machine);
 }
 
-let mode = 'debug';
-// let mode = 'single';
+// let mode = 'debug';
+let mode = 'single';
 // let mode = 'batch';
 
 let mask_mode = true;
@@ -128,22 +129,24 @@ if (mode == 'debug') {
         console.log('layer mask paths', layer_masks_paths)
         let composite_name = fake.word() + fake.word() + fake.word() + '.png'
         let layer_params = {
-            top_step_shape: 1,
-            bottom_step_shape: 1,
+            top_step_shape: 2,
             top_grid_size: 1,
+            bottom_step_shape: 1,
             bottom_grid_size: 1,
         }
 
         let color_params = {
-            top_image: palettes[Math.floor(Math.random() * palettes.length)],
-            bottom_image: palettes[Math.floor(Math.random() * palettes.length)],
-            // top: 'set1',
-            // bottom: 'set1'
+            // top_image: palettes[Math.floor(Math.random() * palettes.length)],
+            // bottom_image: palettes[Math.floor(Math.random() * palettes.length)],
+            top_image: 'set1',
+            bottom_image: 'set1',
+            invert: 'top'
         }
 
         let mask_params = {
-            mask_type: 'squares',
-            mask_name: ''
+            // mask_name must be '' if custom is not selected
+            mask_type: 'full',
+            mask_name: 'm3'
         }
 
         return spawn('python', [
@@ -178,22 +181,30 @@ if (mode == 'debug') {
 
 }
 else if (mode == 'single') {
+    //greens
+    palettes.push(['#32CD32', '#006400', '#808000', '#6B8E23', '#ADFF2F'])
+    palettes.push(["#BB9457",
+        "#92140C",
+        "#FF5400",
+        "#FFBD00",
+        "#7D1538"])
     let params = {
         paths: {
             svg: dbg_path_svg,
             png: dbg_path_png,
         },
-        step_shape: 2,
-        step_path: 2, // overlap order path
-        color_path: 3, // color sequence path
+        step_shape: 3,
+        step_path: 0, // overlap order path
+        color_path: 0, // color sequence path
         grid_scale: { x: 1, y: 1 },
         grid_size: 1,
+        // palette: palettes[palettes.length - 1],
         // palette: palettes[Math.floor(Math.random() * palettes.length)],
-        palette: chet_colors.ice_cube,
+        palette: 'Blues',
         image_id: fake.word() + fake.word(),
-        stroke_weights: [1, .5],
-        rotation: 90,
-        sub_shapes: [1, 2, 4],
+        stroke_weights: [1],
+        rotation: 0,
+        sub_shapes: [1],
         sub_stroke_weights: [1],
     }
     generate_image(params);

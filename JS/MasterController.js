@@ -7,6 +7,7 @@ var Templates = require('./Templates.js');
 var Grid = require('./Grid.js');
 var ColorSequencer = require('./ColorSequencer.js');
 var Path = require('./Path.js');
+var Block = require('./Block.js');
 
 // var Shape = require('./Shape.js')
 
@@ -142,22 +143,10 @@ class MasterController {
             this.paper_height);
 
         let step_path = path_machine.GeneratePath(this.vital_params.step_path, false);
-
-
-        //construction zone=============================================
         let color_path = path_machine.GeneratePath(this.vital_params.color_path, true)
-        // console.log('i love emily laborde', color_path)
-        // color_path = color_path.reverse();
         let color_step = 1 / color_path.length
         let color_origins = color_path.map((c) => { return (c * color_step) });
-
         let color_magnitude = (ss) => { return ((color_step * 2) / ss) }
-
-
-        // let spread = 0.2
-
-        // console.log('color path', color_path, color_origins)
-        // console.log('step path', step_path)
         let origin_index = 0;
         for (let i = 0; i < this.vital_params.grid_size.x; i++) {
             for (let j = 0; j < this.vital_params.grid_size.y; j++) {
@@ -357,116 +346,26 @@ function DrawTriangles(grid_values, colors, color_machine) {
 }
 
 function DrawCustomShape(grid_values, colors, color_machine) {
+
+    let block_machine = new Block()
     for (let k = 0; k < grid_values.sub_shape; k++) {
         for (let l = 0; l < grid_values.sub_shape; l++) {
             let radius = grid_values.width / grid_values.sub_shape / 2
-            let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k + radius / 2
-            let y_local_origin = grid_values.origin.y + grid_values.width / grid_values.sub_shape * l + radius / 2
+            let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k + radius
+            let y_local_origin = grid_values.origin.y + grid_values.width / grid_values.sub_shape * l + radius
             let local_origin = new paper.Point(x_local_origin, y_local_origin);
-            // let origin_circle = new paper.Path.Circle(local_origin, radius)
-            // origin_circle.fillColor = 'black'
-            let concentric_sub_stroke_weights;
-            if (grid_values.sub_shape == 1)
-                concentric_sub_stroke_weights = grid_values.stroke_weight;
-            else
-                concentric_sub_stroke_weights = Templates.ant_attributes.sub_shape.stroke_weights;
+            let block_type = 0;
+            let block = block_machine.GenerateBlock(local_origin, radius, block_type);
+            // let block_path = new paper.Path();
+            block.map((face) => {
+                let face_path = new paper.Path();
+                face.map((point) => {
+                    face_path.add(new paper.Point(point.x, point.y))
+                    face_path.fillColor = color_machine(Math.random()).hex();
+                });
+            })
 
-            let group = createBlock(radius);
-
-            // var length = Math.min(count + values.amount, group.children.length);
-            // for (var i = count; i < length; i++) {
-            let piece = group.children[l];
-            var hexagon = piece.children[0];
-            let color = colors[Math.floor(Math.random() * colors.length)]
-            hexagon.fillColor = color;
-            var top = piece.children[1];
-            top.fillColor = color.clone();
-            top.fillColor.brightness *= 1.5;
-
-            var right = piece.children[2];
-            right.fillColor = color.clone();
-            right.fillColor.brightness *= 0.5;
-
-            // let base_triangle = new paper.Path();
-            // base_triangle.strokeWidth = 0
-            // base_triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y - local_radius));
-            // base_triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
-            // base_triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
-            // grid_values.rotation.sort(() => Math.random() - 0.5)
-            // grid_values.rotation.map((rot) => {
-            //     concentric_sub_stroke_weights.map((sw) => {
-            //         local_radius = radius * sw
-            //         let triangle = new paper.Path();
-            //         triangle.strokeWidth = 0
-            //         triangle.fillColor = color_machine(Math.random()).hex();
-            //         triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y - local_radius));
-            //         triangle.add(new paper.Point(local_origin.x - local_radius, local_origin.y + local_radius));
-            //         triangle.add(new paper.Point(local_origin.x + local_radius, local_origin.y + local_radius));
-            //         let color_val = colors[Math.floor(Math.random() * colors.length)]
-            //         triangle.fillColor = color_machine(color_val).hex();
-            //         triangle.rotate(rot, local_origin)
-
-            //     });
-            // });
         }
     }
 }
 
-// function GenerateSpiralArray(width, height) {
-//     let step_count = 0;
-//     let max_step_count = width * height;
-//     let origin = {
-//         x: Math.floor(width / 2),
-//         y: Math.floor(height / 2),
-//     }
-//     let grid = new Array(width).fill().map(() => new Array(height).fill(0));
-//     let current_direction = 2;
-//     let distance = 1;
-//     let direction_change_count = 0;
-//     let position = {
-//         x: origin.x,
-//         y: origin.y,
-
-//     }
-//     // console.log('positionX positionY step_count direction')
-
-//     while (step_count < max_step_count) {
-//         for (let i = 0; i < distance; i++) {
-//             grid[position.x][position.y] = (step_count)
-//             step_count++;
-//             if (current_direction == 0) {
-
-//                 position = {
-//                     x: (position.x + 1) % width,
-//                     y: position.y
-//                 }
-//             }
-//             else if (current_direction == 1) {
-//                 position = {
-//                     x: position.x,
-//                     y: (position.y + 1) % height,
-//                 }
-//             }
-//             else if (current_direction == 2) {
-//                 position = {
-//                     x: (position.x < 0) ? width - 1 : position.x - 1,
-//                     y: position.y
-//                 }
-//             }
-//             else if (current_direction == 3) {
-//                 position = {
-//                     x: position.x,
-//                     y: (position.y < 0) ? height - 1 : position.y - 1,
-//                 }
-//             }
-//         }
-//         current_direction = (current_direction + 1) % 4
-//         direction_change_count++
-//         if (direction_change_count == 2) {
-//             distance++;
-//             direction_change_count = 0;
-//         }
-//     }
-//     console.log(grid)
-//     return grid
-// }

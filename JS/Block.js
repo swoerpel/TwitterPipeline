@@ -1,6 +1,5 @@
 class Block {
-    constructor(graphic) {
-        this.graphic = graphic
+    constructor() {
         this.generateBlockTemplates()
     }
 
@@ -70,32 +69,57 @@ class Block {
         ])
     }
 
-    getHexOriginShift(ant, hex_radius) {
-        let hex_height = Math.sqrt(3) * hex_radius / 2
-        let x_shift = -ant.x * hex_height / Math.sqrt(3)
-        // x_shift += ant.x * (hex_radius - hex_height)
-        let y_shift = -ant.y * 2 * (hex_radius - hex_height)
-        y_shift -= ant.y * (hex_radius - hex_height)
-        if (ant.x % 2 == 0)
-            y_shift += hex_height
-        let hex_shift = {
-            x: x_shift,
-            y: y_shift,
-        }
-        return hex_shift
-    }
-
     getHexVertices(local_hex_origin, hex_radius, rotation = 0) {
-        let angle = TWO_PI / 6
+        let angle = Math.PI * 2 / 6
         let points = []
         let orientation = 0//Math.PI / 6 // -> pointy top : 0 -> flat top
-        for (let a = 0; a < TWO_PI * (1 - 1 / 6); a += angle) {
-            let sx = local_hex_origin.x + cos(a + orientation + rotation) * hex_radius;
-            let sy = local_hex_origin.y + sin(a + orientation + rotation) * hex_radius;
+        for (let a = 0; a < Math.PI * 2 * (1 - 1 / 6); a += angle) {
+            let sx = local_hex_origin.x + Math.cos(a + orientation + rotation) * hex_radius;
+            let sy = local_hex_origin.y + Math.sin(a + orientation + rotation) * hex_radius;
             points.push({ x: sx, y: sy })
         }
         return points
     }
+
+    GenerateBlock(local_origin, radius, type) {
+        let mid_radius = Math.sqrt(3) * radius / 2 //height
+        let outer_hex_vertices = this.getHexVertices(local_origin, radius)
+        let mid_hex_vertices = this.getHexVertices(local_origin, mid_radius, Math.PI * 2 / 12)
+        let inner_hex_vertices = this.getHexVertices(local_origin, radius / 2)
+
+        let local_hex_grid = [
+            local_origin,
+            ...inner_hex_vertices,
+            ...outer_hex_vertices,
+            ...mid_hex_vertices,
+        ]
+        let block_vertices = this.block_templates[type]
+        // let local_hex_grid = this.getHexVertices(local_origin, radius)
+        // console.log('grid & vertices', local_hex_grid, block_vertices)
+        // console.log('block vertices', block_vertices)
+        let faces = []
+        block_vertices.map((f) => {
+            faces.push(this.getFaceVertices(f.face, local_hex_grid))
+        });
+        // let face = 
+        console.log('current face', faces)
+        return faces
+        // return local_hex_grid
+    }
+
+
+    getFaceVertices(block_vertices, local_hex_grid) {
+        let face = []
+
+        block_vertices.map((v, index) => {
+            face.push({
+                x: local_hex_grid[v].x,
+                y: local_hex_grid[v].y,
+            })
+        });
+        return face
+    }
+
 
 
     //debugging purposes
@@ -152,46 +176,7 @@ class Block {
         })
     }
 
-    drawFace(block_vertices, index, all_local_vertices) {
-        this.graphic.strokeWeight(0)
 
-        this.graphic.beginShape();
-        this.graphic.stroke('black')
-        block_vertices.map((v, index) => {
-            this.graphic.vertex(all_local_vertices[v].x, all_local_vertices[v].y)
-        })
-
-
-        this.graphic.endShape(CLOSE);
-        this.graphic.stroke('black')
-        this.graphic.strokeWeight(20)
-
-        block_vertices.map((v, index) => {
-            // this.graphic.point(all_local_vertices[v].x, all_local_vertices[v].y)
-
-        })
-        this.graphic.strokeWeight(10)
-    }
-
-
-    // DrawBlock(vertices, color, local_hex_origin) {
-    //     let grid_width = cvs_params.x
-    //     let translate = this.centerOrigin(grid_width, this.default_radius)
-    //     this.graphic.translate(translate.x / 2, translate.y / 2)
-    //     this.graphic.strokeWeight(0)
-    //     this.graphic.strokeWeight(12)
-    //     this.graphic.stroke('white')
-    //     this.drawX(vertices, local_hex_origin, color)
-    //     this.drawY(vertices, local_hex_origin, color)
-    //     this.drawZ(vertices, local_hex_origin, color)
-    //     if (false) { //draw origins
-    //         this.graphic.strokeWeight(50)
-    //         this.graphic.stroke('black')
-    //         this.graphic.point(hex_origin.x, hex_origin.y)
-    //         this.graphic.strokeWeight(0)
-    //     }
-    //     this.graphic.translate(-translate.x / 2, -translate.y / 2)
-    // }
 
 
 
@@ -293,4 +278,5 @@ class Block {
     // }
 
 
-} 
+}
+module.exports = Block

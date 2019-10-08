@@ -2,7 +2,7 @@ import sys
 import numpy
 import random
 import json
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageOps
 from os import listdir
 from os.path import isfile, join
 
@@ -32,6 +32,11 @@ def main(argv):
         layer_params['bottom_grid_size'],
         color_params['bottom_image'],
         image_source)
+
+    if color_params['invert'] == 'top':
+        top_im = ImageOps.invert(top_im.convert('RGB'))
+    if color_params['invert'] == 'bottom':
+        bottom_im = ImageOps.invert(bottom_im.convert('RGB'))
 
     mask = GetMask(
         mask_sources[mask_params['mask_type']],

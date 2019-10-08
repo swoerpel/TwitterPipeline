@@ -354,7 +354,9 @@ function DrawCustomShape(grid_values, colors, color_machine) {
             let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k + radius
             let y_local_origin = grid_values.origin.y + grid_values.width / grid_values.sub_shape * l + radius
             let local_origin = new paper.Point(x_local_origin, y_local_origin);
-            let block_type = 0;
+            let block_type = Math.floor(Math.random() * 10)
+            if (Math.random() > 0.5)
+                radius *= 2
             let block = block_machine.GenerateBlock(local_origin, radius, block_type);
             // let block_path = new paper.Path();
             block.map((face) => {

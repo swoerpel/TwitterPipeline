@@ -94,17 +94,12 @@ class Block {
             ...mid_hex_vertices,
         ]
         let block_vertices = this.block_templates[type]
-        // let local_hex_grid = this.getHexVertices(local_origin, radius)
-        // console.log('grid & vertices', local_hex_grid, block_vertices)
-        // console.log('block vertices', block_vertices)
+        console.log('templates', this.block_templates.length)
         let faces = []
         block_vertices.map((f) => {
             faces.push(this.getFaceVertices(f.face, local_hex_grid))
         });
-        // let face = 
-        console.log('current face', faces)
         return faces
-        // return local_hex_grid
     }
 
 
@@ -122,21 +117,7 @@ class Block {
 
 
 
-    //debugging purposes
-    drawPoint(x, y) {
-        this.graphic.strokeWeight(25)
-        this.graphic.stroke('white')
-        this.graphic.point(x, y)
-    }
-    drawSingleHexGrid(vertices, palette) {
-        this.graphic.strokeWeight(40)
-        let color_machine = chroma.scale(palette)
-        vertices.map((v, index) => {
-            // this.graphic.strokeWeight(index * 20)
-            this.graphic.stroke(color_machine(index / vertices.length).hex())
-            this.graphic.point(v.x, v.y)
-        })
-    }
+    /* LEGACY!!!!
     PlaceBlock(ant_grid_indices, local_grid_origin, hex_radius, color) {
         let hex_origin_shift = this.getHexOriginShift(ant_grid_indices, hex_radius)
         let local_hex_origin = {
@@ -156,12 +137,8 @@ class Block {
             ...outer_hex_vertices,
             ...mid_hex_vertices,
         ]
-        //testing purposes
-        // this.drawSingleHexGrid(all_local_vertices, ['white', 'black'])
         let template_index = Math.floor(Math.random() * this.block_templates.length)
-        //array of faces
         let block_vertices = this.block_templates[template_index]
-
         block_vertices.map((block, index) => {
             this.graphic.fill('black')
             this.graphic.stroke(chroma(color).darken(20).hex())
@@ -175,108 +152,6 @@ class Block {
             this.drawFace(block.face, index, all_local_vertices)
         })
     }
-
-
-
-
-
-    drawX(points, local_hex_origin, color) {
-        this.graphic.fill(chroma(color).saturate(-1).hex())
-        // this.graphic.fill(chroma(color).darken(0).hex())
-        // this.graphic.beginShape();
-        this.graphic.point(local_hex_origin.x, local_hex_origin.y)
-        this.graphic.point(points[0].x, points[0].y)
-        this.graphic.point(points[1].x, points[1].y)
-        this.graphic.point(points[2].x, points[2].y)
-        // this.graphic.endShape(CLOSE);
-    }
-
-    drawY(points, local_hex_origin, color) {
-        // this.graphic.fill(chroma(color).saturate(0).hex())
-        this.graphic.fill(chroma(color).darken(1).hex())
-        this.graphic.point(local_hex_origin.x, local_hex_origin.y)
-        this.graphic.point(points[2].x, points[2].y)
-        this.graphic.point(points[3].x, points[3].y)
-        this.graphic.point(points[4].x, points[4].y)
-    }
-
-    drawZ(points, local_hex_origin, color) {
-        // this.graphic.fill(chroma(color).saturate(1).hex())
-        this.graphic.fill(chroma(color).darken(-1).hex())
-        this.graphic.point(local_hex_origin.x, local_hex_origin.y)
-        this.graphic.point(points[4].x, points[4].y)
-        this.graphic.point(points[5].x, points[5].y)
-        this.graphic.point(points[0].x, points[0].y)
-    }
-
-    //=================================================================
-    //original functions
-    // getHexVertices(ant, hex_shift, angle, grid_origin) {
-    //     let local_radius = ant.stroke_weight / 2
-    //     // finding local hex vertices
-    //     let points = []
-    //     let orientation = 0//Math.PI / 6 // -> pointy top : 0 -> flat top
-    //     for (let a = 0; a < TWO_PI; a += angle) {
-    //         let sx = grid_origin.x + cos(a + orientation + ant.rotation) * local_radius;
-    //         let sy = grid_origin.y + sin(a + orientation + ant.rotation) * local_radius;
-    //         points.push({
-    //             x: sx + hex_shift.x, y: sy + hex_shift.y
-    //         })
-    //     }
-    //     return points
-    // }
-
-
-    // scales grid size toward top left corner
-
-
-    centerOrigin(grid_width, default_radius) {
-        // translate to center grid
-        let hex_total_width = (2 * default_radius * grid_width) - ((grid_width - 1) / 2 * default_radius)
-        let x_translate = 0//cvs_params.x - hex_total_width
-        let default_hex_height = (Math.sqrt(3) / 2 * default_radius)
-        let hex_total_height = default_hex_height * (grid_width * 2 + 1)
-        let y_translate = 0//cvs_params.y - hex_total_height - (default_radius - default_hex_height) * 2
-        this.graphic.translate(x_translate / 2, y_translate / 2)
-        return { x: x_translate, y: y_translate }
-    }
-
-
-
-
-    CalculateVertices(ant, grid_origin, scale_hex_grid) {
-        let angle = TWO_PI / 6; //denotes hexagon
-        this.default_radius = grid_params.stroke_weight / 2
-        this.hex_shift = this.getHexOriginShift(ant, this.default_radius)
-
-        if (!scale_hex_grid) {
-            this.hex_shift.x = 0
-            this.hex_shift.y = 0
-        }
-        this.hex_origin = {
-            x: grid_origin.x + this.hex_shift.x,
-            y: grid_origin.y + this.hex_shift.y,
-        }
-        return this.getHexVertices(this.hex_shift, grid_origin)
-    }
-
-
-    // DrawBlock(points, grid_width, color) {
-    //     let translate = this.centerOrigin(grid_width, this.default_radius)
-    //     this.graphic.translate(translate.x / 2, translate.y / 2)
-    //     this.graphic.strokeWeight(0)
-    //     this.drawX(points, color)
-    //     this.drawY(points, color)
-    //     this.drawZ(points, color)
-    //     if (false) { //draw origins
-    //         this.graphic.strokeWeight(50)
-    //         this.graphic.stroke('black')
-    //         this.graphic.point(hex_origin.x, hex_origin.y)
-    //         this.graphic.strokeWeight(0)
-    //     }
-    //     this.graphic.translate(-translate.x / 2, -translate.y / 2)
-    // }
-
-
+    */
 }
 module.exports = Block

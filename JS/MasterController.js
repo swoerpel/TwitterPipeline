@@ -164,13 +164,15 @@ class MasterController {
                         this.vital_params.color_rand)
                 }
                 origin_index++;
+                console.log('current grid', current_grid)
                 let grid_values = {
                     origin: origin,
                     width: this.paper_width / this.vital_params.grid_size.x,
                     color: current_grid.color,
                     sub_shape: current_grid.sub_shape,
                     stroke_weight: current_grid.stroke_weight,
-                    rotation: current_grid.rotation
+                    rotation: current_grid.rotation,
+                    rule: current_grid.rule
                 }
                 let colors = tile_colors.reverse()
                 // let colors = this.SetColors(Templates.ant_attributes.color.style, grid_values.color)
@@ -346,27 +348,30 @@ function DrawTriangles(grid_values, colors, color_machine) {
 }
 
 function DrawCustomShape(grid_values, colors, color_machine) {
-
     let block_machine = new Block()
+    let block_type_count = block_machine.GetBlockTypeCount();
     for (let k = 0; k < grid_values.sub_shape; k++) {
         for (let l = 0; l < grid_values.sub_shape; l++) {
             let radius = grid_values.width / grid_values.sub_shape / 2
             let x_local_origin = grid_values.origin.x + grid_values.width / grid_values.sub_shape * k + radius
             let y_local_origin = grid_values.origin.y + grid_values.width / grid_values.sub_shape * l + radius
             let local_origin = new paper.Point(x_local_origin, y_local_origin);
-            let block_type = Math.floor(Math.random() * 10)
-            if (Math.random() > 0.5)
-                radius *= 2
-            let block = block_machine.GenerateBlock(local_origin, radius, block_type);
-            // let block_path = new paper.Path();
-            block.map((face) => {
-                let face_path = new paper.Path();
-                face.map((point) => {
-                    face_path.add(new paper.Point(point.x, point.y))
-                    face_path.fillColor = color_machine(Math.random()).hex();
-                });
-            })
+            // let block_type = 0//Math.floor(Math.random() * 10)
+            // let block_type = Math.floor(Math.random() * 10)
+            let block_type = grid_values.rule % block_type_count
+            // console.log('grid values', grid_values)
+            grid_values.stroke_weight.map((sw) => {
+                let block = block_machine.GenerateBlock(local_origin, radius * sw, block_type);
+                let color_val = colors[Math.floor(Math.random() * colors.length)]
+                block.map((face) => {
+                    let face_path = new paper.Path();
 
+                    face.points.map((point) => {
+                        face_path.add(new paper.Point(point.x, point.y))
+                    });
+                    face_path.fillColor = color_machine(color_val).darken(face.color_index).hex();
+                })
+            })
         }
     }
 }

@@ -94,14 +94,21 @@ class Block {
             ...mid_hex_vertices,
         ]
         let block_vertices = this.block_templates[type]
-        console.log('templates', this.block_templates.length)
         let faces = []
         block_vertices.map((f) => {
-            faces.push(this.getFaceVertices(f.face, local_hex_grid))
+            // console.log('FUCK', f)
+            faces.push({
+                points: this.getFaceVertices(f.face, local_hex_grid),
+                color_index: f.color_index
+            });
+
         });
         return faces
     }
 
+    GetBlockTypeCount() {
+        return this.block_templates.length
+    }
 
     getFaceVertices(block_vertices, local_hex_grid) {
         let face = []

@@ -183,11 +183,11 @@ if (mode == 'debug') {
 else if (mode == 'single') {
     //greens
     palettes.push(['#32CD32', '#006400', '#808000', '#6B8E23', '#ADFF2F'])
-    palettes.push(["#BB9457",
-        "#92140C",
-        "#FF5400",
-        "#FFBD00",
-        "#7D1538"])
+    palettes.push(["#780116",
+        "#F7B538",
+        "#DB7C26",
+        "#D8572A",
+        "#C32F27"])
     let params = {
         paths: {
             svg: dbg_path_svg,
@@ -195,14 +195,14 @@ else if (mode == 'single') {
         },
         step_shape: 3,
         step_path: 0, // overlap order path
-        color_path: 0, // color sequence path
+        color_path: 1, // color sequence path
         grid_scale: { x: 1, y: 1 },
-        grid_size: 1,
+        grid_size: 4,
         // palette: palettes[palettes.length - 1],
         // palette: palettes[Math.floor(Math.random() * palettes.length)],
         palette: 'Blues',
         image_id: fake.word() + fake.word(),
-        stroke_weights: [1],
+        stroke_weights: [4, 2, 1],
         rotation: 0,
         sub_shapes: [1],
         sub_stroke_weights: [1],

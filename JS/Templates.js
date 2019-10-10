@@ -60,8 +60,8 @@ var rule_templates = [
         decRotation: false,
         incStepSize: false,
         decStepSize: false,
-        incSubShapes: false,
-        decSubShapes: false,
+        incSubShapes: true,
+        decSubShapes: true,
     },
 ]
 

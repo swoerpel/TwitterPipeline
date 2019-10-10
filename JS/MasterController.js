@@ -136,6 +136,10 @@ class MasterController {
         this.image_id = image_id
     }
 
+    linearize_array(grid) {
+        return [...grid.map(((row) => { return [...row] }))]
+    }
+
     DrawGrids(grid) {
         let path_machine = new Path(this.vital_params.grid_size.x,
             this.vital_params.grid_size.y,

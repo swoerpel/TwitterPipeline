@@ -197,12 +197,12 @@ else if (mode == 'single') {
         step_path: 1, // overlap order path
         color_path: 2, // color sequence path
         grid_scale: { x: 1, y: 1 },
-        grid_size: 4,
+        grid_size: 1,
         // palette: palettes[palettes.length - 1],
         // palette: palettes[Math.floor(Math.random() * palettes.length)],
         palette: 'Spectral',
         image_id: fake.word() + fake.word(),
-        stroke_weights: [4, 2, 1],
+        stroke_weights: [1],
         rotation: 0,
         sub_shapes: [1],
         sub_stroke_weights: [1],

@@ -13,6 +13,8 @@ class Grid {
     }
 
     InitializeGrids() {
+        console.log('init gridsize', this.params.grid_size)
+
         this.grid = new Array(this.params.grid_size.x).fill()
             .map(() => new Array(this.params.grid_size.y).fill({
                 rule: 0,
@@ -22,6 +24,9 @@ class Grid {
                 rotation: [],
             }));
     }
+
+
+
 
     SetupRules() {
         this.all_rules = []
@@ -88,6 +93,7 @@ class Grid {
     }
 
     WalkAnts(steps) {
+
         for (let i = 0; i < steps; i++) {
             this.ants.map((ant) => {
                 let rule_value = this.grid[ant.x][ant.y].rule
@@ -122,12 +128,12 @@ class Grid {
         let stroke_weight_array = [...this.grid[ant.x][ant.y].stroke_weight];
         if (stroke_weight_array.indexOf(ant.stroke_weight.values[ant.stroke_weight.index]) == -1)
             stroke_weight_array.push(ant.stroke_weight.values[ant.stroke_weight.index])
-
         let rotation_array = [...this.grid[ant.x][ant.y].rotation];
         let value = (Math.round(ant.rotation.value * 100) / 100)
         if (rotation_array.indexOf(value) == -1)
             rotation_array.push(value);
 
+        // console.log(this.grid[ant.x][ant.y].origin, 'update grid')
         let color_array = [...this.grid[ant.x][ant.y].color];
 
         let rand_index = Math.floor(Math.random() * color_array.length)
@@ -161,14 +167,14 @@ var goStraight = (ant) => {
 }
 
 var incStepSize = (ant) => {
-    ant.step_size = (ant.step_size + 1) % grid_params.max_step_size
+    ant.step_size = (ant.step_size + 1) % 8
 }
 
 var decStepSize = (ant) => {
     if (ant.step_size != 1)
         ant.step_size--
     else
-        ant.step_size = grid_params.max_step_size
+        ant.step_size = 8
 }
 
 var incStrokeWeight = (ant) => {

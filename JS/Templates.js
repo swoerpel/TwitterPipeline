@@ -60,23 +60,30 @@ var rule_templates = [
         decRotation: false,
         incStepSize: false,
         decStepSize: false,
-        incSubShapes: false,
-        decSubShapes: false,
+        incSubShapes: true,
+        decSubShapes: true,
     },
 ]
 
+var scale_sizes = {
+    x: 1,
+    y: 1,
+}
+
 var grid_sizes = [
-    { x: 2, y: 2 },
-    { x: 4, y: 4 },
-    { x: 8, y: 8 },
-    { x: 16, y: 16 },
+    { x: 2 * scale_sizes.x, y: 2 * scale_sizes.y },
+    { x: 4 * scale_sizes.x, y: 4 * scale_sizes.y },
+    { x: 8 * scale_sizes.x, y: 8 * scale_sizes.y },
+    { x: 16 * scale_sizes.x, y: 16 * scale_sizes.y },
+    { x: 32 * scale_sizes.x, y: 32 * scale_sizes.y },
+    { x: 48 * scale_sizes.x, y: 48 * scale_sizes.y },
     // { x: 32, y: 32 },
     // { x: 64, y: 64 },
 ]
 
 var png_dims = {
-    width: 2400,
-    height: 2400
+    x: 2400,// * scale_sizes.x,
+    y: 2400// * scale_sizes.y,
 }
 
 var stroke_weight_templates = [
@@ -119,6 +126,13 @@ var rotation_attributes = {
     delta: 180, //Math.PI / 2
 }
 
+var step_paths = {
+    index: 0
+}
+var color_paths = {
+    index: 0
+}
+
 // ARRAY
 var ant_attributes = { //square
     color: color_attributes,
@@ -132,5 +146,8 @@ exports.grid_sizes = grid_sizes;
 exports.step_shapes = step_shapes;
 exports.stroke_weight_templates = stroke_weight_templates;
 exports.ant_attributes = ant_attributes;
-exports.consts = consts
-exports.png_dims = png_dims
+exports.consts = consts;
+exports.png_dims = png_dims;
+exports.scale_sizes = scale_sizes;
+exports.step_paths = step_paths;
+exports.color_paths = color_paths;
